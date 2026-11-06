@@ -21,3 +21,6 @@ web/dist*/
 data/cache/
 data/runs/
 *.log
+
+# Driver build output
+driver/build/
