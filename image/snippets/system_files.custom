@@ -1,0 +1,11 @@
+# Patchbay: the two drivers, their SPI configuration, and QNX's sample programs built unmodified from upstream.
+[uid=0 gid=0 perms=755] bin/i2c-virtio=__PB_DRIVERS__/i2c-virtio
+[uid=0 gid=0 perms=755] bin/spi-virtio=__PB_DRIVERS__/spi-virtio
+[uid=0 gid=0 perms=644] etc/spi-virtio.conf=__PB_IMAGE__/spi-virtio.conf
+[uid=0 gid=0 perms=755] bin/patchbay-start=__PB_IMAGE__/patchbay-start.sh
+[uid=0 gid=0 perms=755] bin/imu-bno055=__PB_SAMPLES__/imu-bno055
+[uid=0 gid=0 perms=755] bin/temp-humidity-sht3x=__PB_SAMPLES__/temp-humidity-sht3x
+[uid=0 gid=0 perms=755] bin/mcp-3008-joystick=__PB_SAMPLES__/mcp-3008-joystick
+[uid=0 gid=0 perms=755] bin/pci-tool=usr/sbin/pci-tool
+# This OpenSSH runs a separate sshd-auth for each login; post_start.custom links it where sshd looks for it.
+[uid=0 gid=0 perms=755] bin/sshd-auth=usr/libexec/sshd-auth
