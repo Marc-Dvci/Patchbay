@@ -64,7 +64,7 @@ def ctl(*args: str) -> dict[str, object]:
 
 
 def alive(name: str) -> bool:
-    return name in guest(f"pidin -p {name} -f a")
+    return name in guest("pidin ar")
 
 
 def one_bit_from(data: str, want: str) -> bool:
