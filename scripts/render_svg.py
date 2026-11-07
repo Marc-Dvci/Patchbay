@@ -1,6 +1,6 @@
 """Renders an SVG to a PNG at 2x on a white ground, with headless Chromium (Playwright).
 
-    python3 scripts/render_svg.py docs/patchbay-architecture.svg docs/patchbay-architecture.png
+python3 scripts/render_svg.py docs/patchbay-architecture.svg docs/patchbay-architecture.png
 """
 
 from __future__ import annotations
