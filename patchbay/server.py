@@ -70,9 +70,11 @@ class Connection:
     queues: list[Queue] = field(default_factory=list)
     broken: bool = False
     debug: bool = field(default_factory=lambda: bool(os.environ.get("PATCHBAY_DEBUG")))
+    read_timeout: float = 5.0  # seconds a front end may pause inside one message before it is cut off
 
     def __post_init__(self) -> None:
         self.queues = [Queue() for _ in range(self.device.num_queues)]
+        self.sock.settimeout(self.read_timeout)
 
     # --- offered features ------------------------------------------------------------------------------------------
     def offered_features(self) -> int:
@@ -87,25 +89,48 @@ class Connection:
         return int(p)
 
     # --- messages --------------------------------------------------------------------------------------------------
-    def recv(self) -> tuple[vu.Message, list[int]] | None:
-        fds = array.array("i")
-        try:
-            raw, anc, _flags, _addr = self.sock.recvmsg(vu.HEADER.size, socket.CMSG_LEN(vu.MAX_FDS * fds.itemsize))
-        except ConnectionError:
-            return None
-        if not raw:
-            return None
-        for level, typ, data in anc:
-            if level == socket.SOL_SOCKET and typ == socket.SCM_RIGHTS:
-                fds.frombytes(data[: len(data) - (len(data) % fds.itemsize)])
-        req, flags, size = vu.decode_header(raw)
-        payload = b""
-        while len(payload) < size:
-            chunk = self.sock.recv(size - len(payload))
+    def _read_exactly(self, n: int, fds: array.array[int]) -> bytes | None:
+        """n bytes from the stream, however many reads that takes. File descriptors that ride on any of the reads are
+        added to `fds`. None means the peer closed first. A peer that stops sending part-way raises ProtocolError."""
+        buf = b""
+        while len(buf) < n:
+            try:
+                chunk, anc, _flags, _addr = self.sock.recvmsg(n - len(buf), socket.CMSG_LEN(vu.MAX_FDS * fds.itemsize))
+            except TimeoutError:
+                raise vu.ProtocolError("the front end stopped sending in the middle of a message") from None
+            except ConnectionError:
+                return None
+            for level, typ, data in anc:
+                if level == socket.SOL_SOCKET and typ == socket.SCM_RIGHTS:
+                    fds.frombytes(data[: len(data) - (len(data) % fds.itemsize)])
             if not chunk:
                 return None
-            payload += chunk
+            buf += chunk
+        return buf
+
+    def recv(self) -> tuple[vu.Message, list[int]] | None:
+        """The next message and the descriptors that came with it. A stream socket keeps no message boundaries, so
+        the 12-byte header and then exactly the payload it declares are each read until complete."""
+        fds = array.array("i")
+        try:
+            raw = self._read_exactly(vu.HEADER.size, fds)
+            if raw is None:
+                self._close_all(fds)
+                return None
+            req, flags, size = vu.decode_header(raw)
+            payload = self._read_exactly(size, fds) if size else b""
+            if payload is None:
+                self._close_all(fds)
+                return None
+        except vu.ProtocolError:
+            self._close_all(fds)
+            raise
         return vu.Message(req, flags, payload), list(fds)
+
+    @staticmethod
+    def _close_all(fds: array.array[int]) -> None:
+        for fd in fds:
+            os.close(fd)
 
     def reply(self, req: int, payload: bytes) -> None:
         self.sock.sendall(vu.encode_reply(req, payload))

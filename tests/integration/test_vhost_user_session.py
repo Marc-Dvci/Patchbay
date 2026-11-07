@@ -14,6 +14,7 @@ import socket
 import struct
 import tempfile
 import threading
+import time
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -248,5 +249,129 @@ def test_the_server_takes_fault_commands_on_its_control_socket() -> None:
         assert ask({"cmd": "freeze"})["ok"] is False  # this server was given no freezable clock
         assert ask({"cmd": "dance"})["ok"] is False
         assert ask({"cmd": "stop"})["ok"]
+        t.join(timeout=5)
+        assert not t.is_alive()
+
+
+# --- a stream socket keeps no message boundaries ------------------------------------------------------------------
+
+
+def wire(req: int, payload: bytes = b"") -> bytes:
+    return struct.pack("<III", req, vu.VERSION, len(payload)) + payload
+
+
+def trickle(
+    sock: socket.socket, pieces: list[bytes], fds_with: int | None = None, fds: list[int] | None = None
+) -> None:
+    """Send the pieces one at a time with a pause between them, from another thread. `fds` ride on piece `fds_with`."""
+
+    def run() -> None:
+        for i, piece in enumerate(pieces):
+            time.sleep(0.05)
+            anc = []
+            if fds and i == fds_with:
+                anc = [(socket.SOL_SOCKET, socket.SCM_RIGHTS, struct.pack(f"{len(fds)}i", *fds))]
+            sock.sendmsg([piece], anc)
+
+    threading.Thread(target=run, daemon=True).start()
+
+
+def test_a_header_that_arrives_in_two_pieces_is_read_whole(pair: tuple[socket.socket, socket.socket]) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    raw = wire(vu.Req.GET_FEATURES)
+    trickle(a, [raw[:4], raw[4:]])
+    got = conn.recv()
+    assert got is not None and got[0].req == vu.Req.GET_FEATURES and got[1] == []
+
+
+def test_a_header_that_arrives_one_byte_at_a_time_is_read_whole(pair: tuple[socket.socket, socket.socket]) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    payload = struct.pack("<Q", 5)
+    raw = wire(vu.Req.SET_FEATURES, payload)
+    trickle(a, [raw[i : i + 1] for i in range(len(raw))])
+    got = conn.recv()
+    assert got is not None and got[0].req == vu.Req.SET_FEATURES and got[0].payload == payload
+
+
+def test_a_payload_that_arrives_in_pieces_is_read_whole(pair: tuple[socket.socket, socket.socket]) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    payload = struct.pack("<II", 0, 4)
+    raw = wire(vu.Req.SET_VRING_NUM, payload)
+    trickle(a, [raw[:12], payload[:3], payload[3:]])
+    got = conn.recv()
+    assert got is not None and got[0].payload == payload
+
+
+def test_descriptors_sent_with_the_first_piece_of_a_split_header_are_kept(
+    pair: tuple[socket.socket, socket.socket],
+) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    memfd = os.memfd_create("ram")
+    table = struct.pack("<II", 1, 0) + struct.pack("<QQQQ", GPA, SIZE, UVA, 0)
+    raw = wire(vu.Req.SET_MEM_TABLE, table)
+    trickle(a, [raw[:5], raw[5:20], raw[20:]], fds_with=0, fds=[memfd])
+    got = conn.recv()
+    assert got is not None and got[0].payload == table and len(got[1]) == 1
+    os.close(got[1][0])
+    os.close(memfd)
+
+
+def test_descriptors_sent_after_the_header_are_kept(pair: tuple[socket.socket, socket.socket]) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    memfd = os.memfd_create("ram")
+    table = struct.pack("<II", 1, 0) + struct.pack("<QQQQ", GPA, SIZE, UVA, 0)
+    raw = wire(vu.Req.SET_MEM_TABLE, table)
+    trickle(a, [raw[:12], raw[12:]], fds_with=1, fds=[memfd])
+    got = conn.recv()
+    assert got is not None and len(got[1]) == 1
+    os.close(got[1][0])
+    os.close(memfd)
+
+
+def test_a_peer_that_sends_part_of_a_header_and_stops_is_cut_off_instead_of_stalling_the_back_end(
+    pair: tuple[socket.socket, socket.socket],
+) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO(), read_timeout=0.2)
+    a.sendall(wire(vu.Req.GET_FEATURES)[:4])
+    with pytest.raises(vu.ProtocolError, match="stopped sending"):
+        conn.recv()
+
+
+def test_a_peer_that_closes_in_the_middle_of_a_header_ends_the_session(
+    pair: tuple[socket.socket, socket.socket],
+) -> None:
+    a, b = pair
+    conn = Connection("i2c", b, i2c_device(), io.StringIO())
+    a.sendall(wire(vu.Req.GET_FEATURES)[:7])
+    a.close()
+    assert conn.recv() is None
+
+
+def test_the_server_answers_a_request_whose_header_is_split_on_the_wire() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        path = str(Path(d) / "i2c.sock")
+        ctl = str(Path(d) / "control.sock")
+        server = Server({"i2c": (path, i2c_device())}, FaultPlan(), ctl, log=io.StringIO())
+        t = threading.Thread(target=server.run, daemon=True)
+        t.start()
+        with socket.socket(socket.AF_UNIX) as s:
+            s.settimeout(5)
+            s.connect(path)
+            raw = wire(vu.Req.GET_FEATURES)
+            s.sendall(raw[:4])
+            time.sleep(0.1)
+            s.sendall(raw[4:])
+            reply = s.recv(64)
+        assert len(reply) == 20 and struct.unpack_from("<I", reply)[0] == vu.Req.GET_FEATURES
+        with socket.socket(socket.AF_UNIX) as c:
+            c.connect(ctl)
+            c.sendall(b'{"cmd": "stop"}\n')
+            c.makefile().readline()
         t.join(timeout=5)
         assert not t.is_alive()
