@@ -148,31 +148,17 @@ static int spiv_xfer(void *const hdl, spi_dev_t *const spi_dev, uint8_t *const b
     }
 }
 
-static int spiv_dma_xfer(void *const hdl, spi_dev_t *spi_dev, dma_addr_t *addr, const uint32_t tnbytes,
-                         const uint32_t rnbytes)
-{
-    return ENOTSUP;
-}
-
-static int spiv_dma_allocbuf(void *const hdl, dma_addr_t *addr, const uint32_t len)
-{
-    return ENOTSUP;
-}
-
-static int spiv_dma_freebuf(void *const hdl, dma_addr_t *addr)
-{
-    return ENOTSUP;
-}
-
-static spi_funcs_t spiv_funcs = {
+/* The DMA entries stay NULL: io-spi takes the DMA path whenever dma_xfer is set, and this controller's requests already
+ * go through the virtqueue's own DMA arena. */
+static const spi_funcs_t spiv_funcs = {
     .spi_fini = spiv_fini,
     .drvinfo = spiv_drvinfo,
     .devinfo = spiv_devinfo,
     .setcfg = spiv_setcfg,
     .xfer = spiv_xfer,
-    .dma_xfer = spiv_dma_xfer,
-    .dma_allocbuf = spiv_dma_allocbuf,
-    .dma_freebuf = spiv_dma_freebuf,
+    .dma_xfer = NULL,
+    .dma_allocbuf = NULL,
+    .dma_freebuf = NULL,
 };
 
 int spi_init(spi_bus_t *bus)
@@ -213,8 +199,28 @@ int spi_init(spi_bus_t *bus)
             return EINVAL;
         }
     }
-    bus->funcs = &spiv_funcs;
+    /* io-spi frees bus->funcs when it shuts down, so the table it gets is a heap copy. */
+    spi_funcs_t *funcs = malloc(sizeof(*funcs));
+    if (funcs == NULL) {
+        pb_vpci_close(&d->v);
+        free(d);
+        return ENOMEM;
+    }
+    *funcs = spiv_funcs;
+    bus->funcs = funcs;
     bus->drvhdl = d;
+    /* The driver creates the device nodes (/dev/io-spi/<bus>/<dev>): <hw/io-spi.h> lists spi_create_devs() among
+     * the helpers SPI drivers call, and io-spi's dispatch loop needs them attached. */
+    rc = spi_create_devs(bus->devlist);
+    if (rc != EOK) {
+        fprintf(stderr, "spi-virtio: spi_create_devs: %s\n", strerror(rc));
+        bus->funcs = NULL;
+        bus->drvhdl = NULL;
+        free(funcs);
+        pb_vpci_close(&d->v);
+        free(d);
+        return rc;
+    }
     fprintf(stderr, "spi-virtio: %s on virtio SPI controller %u at PCI %x:%x.%x, %u chip selects, max %u Hz, "
                     "queue %u, irq %d%s\n",
             bus->name, d->index, PCI_BUS(d->v.bdf), PCI_DEV(d->v.bdf), PCI_FUNC(d->v.bdf), d->cfg.cs_max_number,

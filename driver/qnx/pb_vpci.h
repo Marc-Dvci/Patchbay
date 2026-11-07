@@ -3,8 +3,13 @@
  *
  * Finds the device through the PCI server (libpci), maps the common, notify, ISR and device configuration structures
  * named by its vendor capabilities, allocates one physically contiguous DMA block for the virtqueue and the request
- * arena, and waits for completions on an interrupt pulse with a deadline. Every wait ends: on completion, on the
- * deadline, or on a device that has set DEVICE_NEEDS_RESET.
+ * arena, and waits for completions with a deadline. Every wait ends: on completion, on the deadline, or on a device
+ * that has set DEVICE_NEEDS_RESET.
+ *
+ * Interrupts: the legacy INTx line is often shared (both Patchbay controllers sit on one in QEMU's pc machine), and the
+ * kernel unmasks a line only when every process attached to it has called InterruptUnmask(). So a dedicated thread
+ * receives the interrupt pulse, reads the ISR status (which deasserts this device's line) and unmasks at once, whether
+ * or not a transfer is waiting; the transfer waits on a condition variable.
  */
 #ifndef PB_VPCI_H
 #define PB_VPCI_H
@@ -12,6 +17,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <pthread.h>
 #include <pci/pci.h>
 
 #include "pb_vring.h"
@@ -33,6 +39,11 @@ struct pb_vpci {
     int irq;
     int iid;            /* interrupt id, -1 when polling */
     int chid, coid;
+    int irq_thread_up;
+    pthread_t irq_thread;
+    pthread_mutex_t lock;
+    pthread_cond_t cond;  /* signalled on every interrupt; waits use CLOCK_MONOTONIC deadlines */
+    unsigned irq_count;
     uint64_t offered;   /* features the device offered */
     uint64_t features;  /* features negotiated */
     uint64_t wanted;    /* features the driver asks for, beyond VERSION_1 */

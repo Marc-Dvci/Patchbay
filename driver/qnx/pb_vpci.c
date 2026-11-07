@@ -47,6 +47,7 @@
 
 #define NO_VECTOR          0xFFFFu
 #define PULSE_IRQ          (_PULSE_CODE_MINAVAIL + 1)
+#define PULSE_STOP         (_PULSE_CODE_MINAVAIL + 2)
 #define IRQ_PRIORITY       21
 
 static void seterr(char *buf, size_t len, const char *fmt, ...)
@@ -292,6 +293,78 @@ static int bring_up(struct pb_vpci *v, uint16_t max_qsize, char *err, size_t err
     return EOK;
 }
 
+static void *irq_loop(void *arg)
+{
+    struct pb_vpci *v = arg;
+    for (;;) {
+        struct _pulse pulse;
+        if (MsgReceivePulse(v->chid, &pulse, sizeof(pulse), NULL) == -1) {
+            continue;
+        }
+        if (pulse.code == PULSE_STOP) {
+            return NULL;
+        }
+        if (pulse.code != PULSE_IRQ) {
+            continue;
+        }
+        (void)r8(v->isr, 0);  /* reading the ISR status deasserts this device's line */
+        InterruptUnmask(v->irq, v->iid);  /* at once: the line may be shared with another driver */
+        pthread_mutex_lock(&v->lock);
+        v->irq_count++;
+        pthread_cond_broadcast(&v->cond);
+        pthread_mutex_unlock(&v->lock);
+    }
+}
+
+static int start_irq(struct pb_vpci *v)
+{
+    pthread_condattr_t ca;
+    pthread_condattr_init(&ca);
+    pthread_condattr_setclock(&ca, CLOCK_MONOTONIC);
+    pthread_cond_init(&v->cond, &ca);
+    pthread_condattr_destroy(&ca);
+    pthread_mutex_init(&v->lock, NULL);
+    v->chid = ChannelCreate(_NTO_CHF_PRIVATE);
+    v->coid = v->chid >= 0 ? ConnectAttach(0, 0, v->chid, _NTO_SIDE_CHANNEL, 0) : -1;
+    int_t nirq = 1;
+    pci_irq_t irq = -1;
+    if (v->coid < 0 || pci_device_read_irq(v->hdl, &nirq, &irq) != PCI_ERR_OK || nirq < 1 || irq < 0) {
+        return -1;
+    }
+    v->irq = irq;
+    if (pthread_create(&v->irq_thread, NULL, irq_loop, v) != EOK) {
+        return -1;
+    }
+    v->irq_thread_up = 1;
+    pthread_setname_np(v->irq_thread, "virtio-irq");
+    struct sigevent ev;
+    SIGEV_PULSE_INIT(&ev, v->coid, IRQ_PRIORITY, PULSE_IRQ, 0);
+    v->iid = InterruptAttachEvent(irq, &ev, _NTO_INTR_FLAGS_TRK_MSK);
+    trace("irq %d attached as %d", irq, v->iid);
+    return v->iid >= 0 ? 0 : -1;
+}
+
+static void stop_irq(struct pb_vpci *v)
+{
+    if (v->iid >= 0) {
+        InterruptDetach(v->iid);
+        v->iid = -1;
+    }
+    if (v->irq_thread_up) {
+        MsgSendPulse(v->coid, IRQ_PRIORITY, PULSE_STOP, 0);
+        pthread_join(v->irq_thread, NULL);
+        v->irq_thread_up = 0;
+    }
+    if (v->coid >= 0) {
+        ConnectDetach(v->coid);
+        v->coid = -1;
+    }
+    if (v->chid >= 0) {
+        ChannelDestroy(v->chid);
+        v->chid = -1;
+    }
+}
+
 int pb_vpci_open(struct pb_vpci *v, uint16_t virtio_id, unsigned index, uint64_t wanted, uint16_t max_qsize,
                  size_t arena_len, char *err, size_t errlen)
 {
@@ -361,17 +434,8 @@ int pb_vpci_open(struct pb_vpci *v, uint16_t virtio_id, unsigned index, uint64_t
     }
     v->qsize = v->vq.size;
     trace("device up: features %#llx, queue %u", (unsigned long long)v->features, v->qsize);
-
-    v->chid = ChannelCreate(_NTO_CHF_PRIVATE);
-    v->coid = v->chid >= 0 ? ConnectAttach(0, 0, v->chid, _NTO_SIDE_CHANNEL, 0) : -1;
-    int_t nirq = 1;
-    pci_irq_t irq = -1;
-    if (v->coid >= 0 && pci_device_read_irq(v->hdl, &nirq, &irq) == PCI_ERR_OK && nirq >= 1 && irq >= 0) {
-        struct sigevent ev;
-        SIGEV_PULSE_INIT(&ev, v->coid, IRQ_PRIORITY, PULSE_IRQ, 0);
-        v->irq = irq;
-        v->iid = InterruptAttachEvent(irq, &ev, _NTO_INTR_FLAGS_TRK_MSK);
-        trace("irq %d attached as %d", irq, v->iid);
+    if (start_irq(v) != 0) {
+        stop_irq(v);  /* no interrupt: pb_vpci_run polls */
     }
     return EOK;
 }
@@ -413,6 +477,12 @@ int pb_vpci_run(struct pb_vpci *v, const uint16_t *heads, unsigned n, uint32_t *
         uint16_t h;
         uint32_t len;
         int r;
+        unsigned seen = 0;
+        if (v->iid >= 0) {
+            pthread_mutex_lock(&v->lock);
+            seen = v->irq_count;  /* taken before the ring is read, so no interrupt is missed */
+            pthread_mutex_unlock(&v->lock);
+        }
         while ((r = pb_vq_get_used(&v->vq, &h, &len)) > 0) {
             for (unsigned i = 0; i < n; i++) {
                 if (!done[i] && heads[i] == h) {
@@ -442,12 +512,15 @@ int pb_vpci_run(struct pb_vpci *v, const uint16_t *heads, unsigned n, uint32_t *
         }
         uint64_t left = deadline - t;
         if (v->iid >= 0) {
-            struct _pulse pulse;
-            TimerTimeout(CLOCK_MONOTONIC, _NTO_TIMEOUT_RECEIVE, NULL, &left, NULL);
-            if (MsgReceivePulse(v->chid, &pulse, sizeof(pulse), NULL) == 0 && pulse.code == PULSE_IRQ) {
-                (void)r8(v->isr, 0);  /* reading the ISR status deasserts the line */
-                InterruptUnmask(v->irq, v->iid);
+            struct timespec abs = { .tv_sec = (time_t)(deadline / 1000000000ull),
+                                    .tv_nsec = (long)(deadline % 1000000000ull) };
+            pthread_mutex_lock(&v->lock);
+            while (v->irq_count == seen) {
+                if (pthread_cond_timedwait(&v->cond, &v->lock, &abs) == ETIMEDOUT) {
+                    break;
+                }
             }
+            pthread_mutex_unlock(&v->lock);
         } else {
             sleep_us(left > 200000ull ? 200u : (unsigned)(left / 1000u) + 1u);
         }
@@ -459,18 +532,7 @@ void pb_vpci_close(struct pb_vpci *v)
     if (v->common != NULL) {
         (void)wait_reset(v);
     }
-    if (v->iid >= 0) {
-        InterruptDetach(v->iid);
-        v->iid = -1;
-    }
-    if (v->coid >= 0) {
-        ConnectDetach(v->coid);
-        v->coid = -1;
-    }
-    if (v->chid >= 0) {
-        ChannelDestroy(v->chid);
-        v->chid = -1;
-    }
+    stop_irq(v);
     if (v->dma != NULL) {
         munmap(v->dma, v->dma_len);
         v->dma = NULL;
