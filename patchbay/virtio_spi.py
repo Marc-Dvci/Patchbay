@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from typing import TextIO
 
 from .clock import Clock
+from .decode import describe_spi
+from .events import EventLog
 from .faults import FaultPlan
 from .spi_bus import MODE_CPHA, MODE_CPOL, MODE_CS_HIGH, MODE_LOOP, MODE_LSB_FIRST, SpiBus, SpiTransfer
 from .vring import Chain, DeviceRing
@@ -139,6 +141,7 @@ class VirtioSpi:
     completed: int = 0
     failed: int = 0
     trace: TextIO | None = None
+    events: EventLog | None = None
 
     @property
     def config(self) -> bytes:
@@ -194,13 +197,21 @@ class VirtioSpi:
             result = TRANS_ERR
         if result != TRANS_OK:
             self.failed += 1
-            self._trace(req, "param-err" if result == PARAM_ERR else "trans-err")
+            self._trace(req, "param-err" if result == PARAM_ERR else "trans-err", result=result)
             return (req.chain.head, answer(req, result))
         rx = self.bus.transfer(SpiTransfer(req.cs, req.tx, req.rx_len, req.mode, req.freq, req.bits_per_word))
         self.completed += 1
-        self._trace(req, "ok " + rx.hex())
+        self._trace(req, "ok " + rx.hex(), rx)
         return (req.chain.head, answer(req, TRANS_OK, rx))
 
-    def _trace(self, req: SpiRequest, state: str) -> None:
+    def _trace(self, req: SpiRequest, state: str, rx: bytes = b"", result: int = TRANS_OK) -> None:
         if self.trace is not None:
             print(f"spi  cs{req.cs} tx {req.tx.hex() or '-'} rx{req.rx_len} {state}", file=self.trace, flush=True)
+        if self.events is not None:
+            ok = result == TRANS_OK
+            what = describe_spi(req.cs, req.tx, rx, ok)
+            if result == PARAM_ERR:
+                what += " (parameter error)"
+            elif result == TRANS_ERR:
+                what += " (controller error)"
+            self.events.emit({"type": "spi", "cs": req.cs, "tx": req.tx.hex(), "rx": rx.hex(), "ok": ok, "what": what})

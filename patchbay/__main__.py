@@ -10,13 +10,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import socket
 import sys
 
 from .chips.bno055 import Bno055
 from .chips.mcp3008 import Mcp3008
 from .chips.sht3x import Sht3x
 from .clock import FreezableClock
+from .control import control
+from .events import EventLog
 from .faults import KINDS, FaultPlan
 from .i2c_bus import I2cBus
 from .server import Device, Server
@@ -26,7 +27,12 @@ from .virtio_spi import VirtioSpi
 
 
 def build_devices(
-    i2c: str | None, spi: str | None, faults: FaultPlan, trace: bool, clock: FreezableClock
+    i2c: str | None,
+    spi: str | None,
+    faults: FaultPlan,
+    trace: bool,
+    clock: FreezableClock,
+    events: EventLog | None = None,
 ) -> dict[str, tuple[str, Device]]:
     out: dict[str, tuple[str, Device]] = {}
     tracer = sys.stdout if trace else None
@@ -34,26 +40,12 @@ def build_devices(
         bus = I2cBus(faults)
         bus.attach(Bno055(clock))
         bus.attach(Sht3x(clock))
-        out["i2c"] = (i2c, VirtioI2c(bus, faults, clock, trace=tracer))
+        out["i2c"] = (i2c, VirtioI2c(bus, faults, clock, trace=tracer, events=events))
     if spi:
         sbus = SpiBus(cs_count=2, faults=faults)
         sbus.attach(0, Mcp3008(clock))
-        out["spi"] = (spi, VirtioSpi(sbus, faults, clock, trace=tracer))
+        out["spi"] = (spi, VirtioSpi(sbus, faults, clock, trace=tracer, events=events))
     return out
-
-
-def control(path: str, request: dict[str, object]) -> dict[str, object]:
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        s.settimeout(5)
-        s.connect(path)
-        s.sendall((json.dumps(request) + "\n").encode())
-        buf = b""
-        while not buf.endswith(b"\n"):
-            chunk = s.recv(65536)
-            if not chunk:
-                break
-            buf += chunk
-    return json.loads(buf)  # type: ignore[no-any-return]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -69,6 +61,7 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="connect to sockets QEMU listens on (server=on), and reconnect after a restart",
     )
+    s.add_argument("--events", help="append every bus transaction and fault, as JSON lines, to this file")
     c = sub.add_parser("ctl", help="talk to a running back end")
     c.add_argument("--control", required=True)
     csub = c.add_subparsers(dest="action", required=True)
@@ -85,15 +78,34 @@ def main(argv: list[str] | None = None) -> int:
     csub.add_parser("freeze", help="stop simulated time: sensor values hold still")
     csub.add_parser("thaw", help="start simulated time again")
     csub.add_parser("stop")
+    pn = sub.add_parser("panel", help="the patch panel: a local web page that shows the buses and drives the faults")
+    pn.add_argument("--recorded", action="store_true", help="replay the recorded session; needs no QNX and no guest")
+    pn.add_argument("--fixture", help="recorded session to replay (default: the committed one)")
+    pn.add_argument("--control", help="live: the back end's control socket")
+    pn.add_argument("--events", help="live: the back end's events file (serve --events)")
+    pn.add_argument("--samples", help="live: directory of the guest samples' output, one <name>.log each")
+    pn.add_argument("--port", type=int, default=8093)
     a = p.parse_args(argv)
 
+    if a.cmd == "panel":
+        from .panel import run_panel
+
+        if not a.recorded and not (a.control and a.events):
+            p.error("give --recorded, or --control and --events for a live back end")
+        return run_panel(a)
     if a.cmd == "serve":
         if not a.i2c and not a.spi:
             p.error("give --i2c, --spi or both")
         faults = FaultPlan()
         clock = FreezableClock()
+        events = EventLog(a.events) if a.events else None
         Server(
-            build_devices(a.i2c, a.spi, faults, a.trace, clock), faults, a.control, clock=clock, connect=a.connect
+            build_devices(a.i2c, a.spi, faults, a.trace, clock, events),
+            faults,
+            a.control,
+            clock=clock,
+            connect=a.connect,
+            events=events,
         ).run()
         return 0
     req: dict[str, object] = {"cmd": a.action}

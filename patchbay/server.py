@@ -19,6 +19,7 @@ from typing import Protocol, TextIO
 
 from . import vhost_user as vu
 from .clock import FreezableClock
+from .events import EventLog
 from .faults import Fault, FaultPlan
 from .memory import GuestMemory, MemoryFault, Region
 from .vring import DeviceRing, RingError
@@ -295,6 +296,7 @@ class Server:
         log: TextIO = sys.stdout,
         clock: FreezableClock | None = None,
         connect: bool = False,
+        events: EventLog | None = None,
     ) -> None:
         """connect=False: listen on each device's socket path, QEMU connects (QEMU's default, client mode).
         connect=True: QEMU listens (server=on) and this back end connects, and connects again after losing the
@@ -304,6 +306,7 @@ class Server:
         self.log = log
         self.clock = clock
         self.connect = connect
+        self.events = events
         self.retry_at: dict[str, float] = {}
         self.sel = selectors.DefaultSelector()
         self.listeners: dict[str, socket.socket] = {}
@@ -469,10 +472,14 @@ class Server:
                 )
                 self.faults.add(f)
                 self.say(f"fault on: {f.describe()}")
+                if self.events is not None:
+                    self.events.emit({"type": "fault", "action": "add", "fault": f.describe()})
                 return {"ok": True, "faults": self.faults.describe()}
             if cmd == "clear":
                 n = self.faults.clear(req.get("bus"))
                 self.say(f"faults cleared: {n}")
+                if self.events is not None:
+                    self.events.emit({"type": "fault", "action": "clear", "bus": req.get("bus"), "cleared": n})
                 return {"ok": True, "cleared": n}
             if cmd == "status":
                 out: dict[str, object] = {"ok": True, "faults": self.faults.describe(), "devices": {}}

@@ -16,6 +16,8 @@ from dataclasses import dataclass, field
 from typing import TextIO
 
 from .clock import Clock
+from .decode import describe_i2c
+from .events import EventLog
 from .faults import FaultPlan
 from .i2c_bus import I2cBus, Segment
 from .vring import Chain, DeviceRing
@@ -89,6 +91,7 @@ class VirtioI2c:
     completed: int = 0
     failed: int = 0
     trace: TextIO | None = None
+    events: EventLog | None = None
 
     def reset(self) -> None:
         """The front end stopped the queue: requests in flight are dropped, as a reset device would."""
@@ -131,6 +134,17 @@ class VirtioI2c:
         if self.faults.take("i2c", "error") or not all(r.valid for r in group):
             self.failed += 1
             self._trace(group, None)
+            if self.events is not None:
+                self.events.emit(
+                    {
+                        "type": "i2c",
+                        "segs": [
+                            {"addr": r.addr, "dir": "R" if r.read else "W", "data": "", "ok": False} for r in group
+                        ],
+                        "ok": False,
+                        "what": "controller error: transfer refused before the bus",
+                    }
+                )
             return [(r.chain.head, answer(r, False)) for r in group]
         segs = [Segment(r.addr, r.read, r.data, r.read_len) for r in group]
         results = self.bus.transfer(segs)
@@ -139,6 +153,20 @@ class VirtioI2c:
         else:
             self.failed += 1
         self._trace(group, [res.ok for res in results])
+        if self.events is not None:
+            segs = [
+                (r.addr, r.read, res.data if r.read else r.data, res.ok) for r, res in zip(group, results, strict=True)
+            ]
+            self.events.emit(
+                {
+                    "type": "i2c",
+                    "segs": [
+                        {"addr": a, "dir": "R" if rd else "W", "data": d.hex(), "ok": ok} for a, rd, d, ok in segs
+                    ],
+                    "ok": all(res.ok for res in results),
+                    "what": describe_i2c(segs),
+                }
+            )
         return [(r.chain.head, answer(r, res.ok, res.data)) for r, res in zip(group, results, strict=True)]
 
     def _trace(self, group: list[I2cRequest], oks: list[bool] | None) -> None:

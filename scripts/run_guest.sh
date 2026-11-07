@@ -61,7 +61,8 @@ start_backend() {
     BACKEND_LOG="$RUN/backend-$stamp.log"
     echo "$s/control-$stamp.sock" >"$RUN/control.path"
     PYTHONPATH="$REPO" nohup "$PY" -m patchbay serve --i2c "$s/i2c.sock" --spi "$s/spi.sock" \
-        --control "$s/control-$stamp.sock" --trace >"$BACKEND_LOG" 2>&1 &
+        --control "$s/control-$stamp.sock" --events "$s/events-$stamp.jsonl" --trace >"$BACKEND_LOG" 2>&1 &
+    echo "$s/events-$stamp.jsonl" >"$RUN/events.path"
     echo $! >"$RUN/backend.pid"
     ln -sf "$BACKEND_LOG" "$RUN/backend.log"
     for _ in $(seq 50); do grep -q 'ready:' "$BACKEND_LOG" 2>/dev/null && return; sleep 0.1; done
