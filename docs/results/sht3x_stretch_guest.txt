@@ -1,5 +1,5 @@
 # QEMU, TCG. temp-humidity-sht3x, the unmodified QNX sample, after the SHT3x clock-stretch change.
-guest up after 9 s (QEMU, TCG); console: /home/dev/Patchbay-work/run/console-20261107-040840.log
+guest up after 9 s (QEMU, TCG); console: ~/Patchbay-work/run/console-20261107-040840.log
 ## sample output
 Temp: 22.54°C, Humidity: 45.20%
 Temp: 22.55°C, Humidity: 45.21%
