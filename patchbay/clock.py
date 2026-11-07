@@ -24,3 +24,26 @@ class FakeClock:
 
     def advance(self, seconds: float) -> None:
         self.t += seconds
+
+
+class FreezableClock:
+    """The host's monotonic clock, which the control socket can stop and restart without a jump. While it is stopped
+    the simulated motion and signals hold still, so a faulted reading can be compared with a fixed clean one."""
+
+    def __init__(self) -> None:
+        self.offset = 0.0
+        self.frozen_at: float | None = None
+
+    def now(self) -> float:
+        if self.frozen_at is not None:
+            return self.frozen_at
+        return time.monotonic() - self.offset
+
+    def freeze(self) -> None:
+        if self.frozen_at is None:
+            self.frozen_at = self.now()
+
+    def thaw(self) -> None:
+        if self.frozen_at is not None:
+            self.offset = time.monotonic() - self.frozen_at
+            self.frozen_at = None

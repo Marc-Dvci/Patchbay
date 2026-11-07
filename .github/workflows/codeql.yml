@@ -1,5 +1,5 @@
-# Static analysis of the Python, the web code and these workflows. Its runs and badge are public; its alerts are
-# visible only to people with write access.
+# Static analysis of the back end (Python), the driver core (C, built for the host) and these workflows. Its runs and
+# badge are public; its alerts are visible only to people with write access.
 name: codeql
 on:
   push:
@@ -19,13 +19,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript-typescript, actions]
+        include:
+          - language: python
+            build-mode: none
+          - language: actions
+            build-mode: none
+          - language: c-cpp
+            build-mode: manual
     steps:
       - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: none
+          build-mode: ${{ matrix.build-mode }}
+      - if: matrix.build-mode == 'manual'
+        run: make -C driver host
       - uses: github/codeql-action/analyze@v4
         with:
           category: /language:${{ matrix.language }}

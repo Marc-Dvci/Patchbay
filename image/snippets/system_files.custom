@@ -1,6 +1,7 @@
 # Patchbay: the two drivers, their SPI configuration, and QNX's sample programs built unmodified from upstream.
 [uid=0 gid=0 perms=755] bin/i2c-virtio=__PB_DRIVERS__/i2c-virtio
 [uid=0 gid=0 perms=755] bin/spi-virtio=__PB_DRIVERS__/spi-virtio
+[uid=0 gid=0 perms=755] bin/pbprobe=__PB_DRIVERS__/pbprobe
 [uid=0 gid=0 perms=644] etc/spi-virtio.conf=__PB_IMAGE__/spi-virtio.conf
 [uid=0 gid=0 perms=755] bin/patchbay-start=__PB_IMAGE__/patchbay-start.sh
 [uid=0 gid=0 perms=755] bin/imu-bno055=__PB_SAMPLES__/imu-bno055

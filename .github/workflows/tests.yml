@@ -1,5 +1,10 @@
-# On every push: lint, format, types, tests with coverage of the decision core, spelling and local links (Python);
-# the web build when there is one; and the Docker image, started and asked for its health and its page.
+# On every push: the host side of Patchbay, with no QNX SDP, no guest and no network.
+#   C: the driver core built with the host compiler, its unit tests under AddressSanitizer and UBSan.
+#   Python: lint, format, strict types, the back end's unit, cross (C core against Python device) and integration
+#   tests with coverage, and the mutation check of the C core.
+#   Shell scripts: shellcheck. Docs: spelling and local links.
+# The QNX build itself needs QNX SDP 8.0, which is licensed per developer and cannot be installed here; it is checked
+# locally with scripts/build_drivers.sh (see README, "Build and run").
 # Read-only: nothing here writes to the repository.
 name: tests
 on:
@@ -9,7 +14,7 @@ on:
 permissions:
   contents: read
 jobs:
-  python:
+  host:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,9 +27,13 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy
-      - name: Tests in random order, with line and branch coverage of the decision core
+      - name: C unit tests of the driver core, under ASan and UBSan
+        run: make -C driver check | tee c-tests.log
+      - name: Python tests in random order, with line and branch coverage of the back end
         shell: bash
-        run: python -m pytest -q --cov --randomly-seed="$GITHUB_RUN_ID" | tee pytest.log
+        run: python -m pytest -q --cov --cov-branch --randomly-seed="$GITHUB_RUN_ID" | tee pytest.log
+      - name: Mutation check of the C core (each deliberate bug must fail a test)
+        run: PYTHON=python bash scripts/mutation_check.sh | tee mutation.log
       - name: Summary on the run page
         if: always()
         shell: bash
@@ -33,51 +42,25 @@ jobs:
           {
             echo "### Tests"
             echo
-            grep -E "passed|failed" pytest.log | tail -n 1
-            echo "Random order: replay it with \`python -m pytest --randomly-seed=$GITHUB_RUN_ID\`."
-            echo
             echo "| Kind | Tests |"
             echo "|---|---|"
-            echo "| Unit | $(count 'not integration and not e2e and not live') |"
-            echo "| Integration | $(count integration) |"
-            echo "| End-to-end | $(count e2e) |"
+            echo "| Python unit | $(count 'not cross and not integration and not guest') |"
+            echo "| Cross (C core against the Python device) | $(count cross) |"
+            echo "| Integration (vhost-user over sockets) | $(count integration) |"
+            echo "| C unit | $(grep -Eo '^[0-9]+ tests' c-tests.log | grep -Eo '[0-9]+' || echo 0) |"
             echo
-            echo "### Coverage of the decision core (lines and branches)"
+            grep -E "passed|failed" pytest.log | tail -n 1
+            echo
+            echo "Random order: replay it with \`python -m pytest --randomly-seed=$GITHUB_RUN_ID\`."
+            echo
+            echo "### Mutation check"
+            echo
+            tail -n 1 mutation.log
+            echo
+            echo "### Coverage of the back end (lines and branches)"
             echo
             python -m coverage report --format=markdown
           } >> "$GITHUB_STEP_SUMMARY"
+      - run: shellcheck scripts/*.sh image/*.sh
       - run: codespell
       - run: python scripts/check_links.py
-      - run: python scripts/check_placeholders.py
-  web:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - id: has
-        run: echo "build=$([ -f web/package.json ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
-      - if: steps.has.outputs.build == 'yes'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - if: steps.has.outputs.build == 'yes'
-        working-directory: web
-        run: |
-          npm ci
-          npx tsc -b
-          npx eslint src
-          npx vite build
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: docker build --target demo -t project:demo .
-      - run: docker run -d --name demo -p 127.0.0.1:8787:8787 project:demo
-      - name: The API and the web app answer
-        run: |
-          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8787/api/health > /dev/null && break; sleep 2; done
-          curl -fs http://127.0.0.1:8787/api/health | grep -q '"demo":true'
-          curl -fs http://127.0.0.1:8787/ | grep -q '<title>'
-      - if: failure()
-        run: docker logs demo

@@ -16,7 +16,7 @@ import sys
 from .chips.bno055 import Bno055
 from .chips.mcp3008 import Mcp3008
 from .chips.sht3x import Sht3x
-from .clock import MonotonicClock
+from .clock import FreezableClock
 from .faults import KINDS, FaultPlan
 from .i2c_bus import I2cBus
 from .server import Device, Server
@@ -25,8 +25,9 @@ from .virtio_i2c import VirtioI2c
 from .virtio_spi import VirtioSpi
 
 
-def build_devices(i2c: str | None, spi: str | None, faults: FaultPlan, trace: bool) -> dict[str, tuple[str, Device]]:
-    clock = MonotonicClock()
+def build_devices(
+    i2c: str | None, spi: str | None, faults: FaultPlan, trace: bool, clock: FreezableClock
+) -> dict[str, tuple[str, Device]]:
     out: dict[str, tuple[str, Device]] = {}
     tracer = sys.stdout if trace else None
     if i2c:
@@ -63,6 +64,11 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--spi", help="vhost-user socket path for the SPI controller")
     s.add_argument("--control", help="control socket path")
     s.add_argument("--trace", action="store_true", help="print every bus transaction")
+    s.add_argument(
+        "--connect",
+        action="store_true",
+        help="connect to sockets QEMU listens on (server=on), and reconnect after a restart",
+    )
     c = sub.add_parser("ctl", help="talk to a running back end")
     c.add_argument("--control", required=True)
     csub = c.add_subparsers(dest="action", required=True)
@@ -76,6 +82,8 @@ def main(argv: list[str] | None = None) -> int:
     cl = csub.add_parser("clear")
     cl.add_argument("--bus", choices=("i2c", "spi"))
     csub.add_parser("status")
+    csub.add_parser("freeze", help="stop simulated time: sensor values hold still")
+    csub.add_parser("thaw", help="start simulated time again")
     csub.add_parser("stop")
     a = p.parse_args(argv)
 
@@ -83,7 +91,10 @@ def main(argv: list[str] | None = None) -> int:
         if not a.i2c and not a.spi:
             p.error("give --i2c, --spi or both")
         faults = FaultPlan()
-        Server(build_devices(a.i2c, a.spi, faults, a.trace), faults, a.control).run()
+        clock = FreezableClock()
+        Server(
+            build_devices(a.i2c, a.spi, faults, a.trace, clock), faults, a.control, clock=clock, connect=a.connect
+        ).run()
         return 0
     req: dict[str, object] = {"cmd": a.action}
     if a.action == "fault":

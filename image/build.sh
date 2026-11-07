@@ -20,8 +20,7 @@ for f in "$REPO/driver/build/$ARCH/i2c-virtio" "$REPO/driver/build/$ARCH/spi-vir
     [ -f "$f" ] || { echo "missing $f: run scripts/build_drivers.sh" >&2; exit 1; }
 done
 mkdir -p "$IMAGE_DIR/local/snippets"
-rm -f "$IMAGE_DIR"/local/snippets/*.custom
-for f in "$HERE"/snippets/*.custom; do
+for f in "$HERE"/snippets/*.custom; do  # each generated snippet is overwritten in place
     sed -e "s#__PB_DRIVERS__#$REPO/driver/build/$ARCH#g" -e "s#__PB_SAMPLES__#$WORK/samples/$ARCH#g" \
         -e "s#__PB_IMAGE__#$HERE#g" "$f" >"$IMAGE_DIR/local/snippets/$(basename "$f")"
 done

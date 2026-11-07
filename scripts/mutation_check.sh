@@ -7,8 +7,7 @@ set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 PY="${PYTHON:-python3}"
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+TMP="$(mktemp -d)"  # one fresh temporary directory per build; nothing is removed
 # file @@ original text @@ broken text (literal, not patterns)
 mutants=(
     'pb_vring.c@@q->num_free = (uint16_t)(q->num_free + q->chain_len[id]);@@q->num_free = (uint16_t)(q->num_free + q->chain_len[id] - 1u);'
@@ -33,7 +32,8 @@ if ! "$TMP/test_mut" >/dev/null || ! (cd "$REPO" && PB_CORE_LIB="$TMP/libmut.so"
 fi
 echo "control   unmodified core passes"
 for m in "${mutants[@]}"; do
-    rm -rf "$TMP/core" && cp -r "$REPO/driver/core" "$TMP/core"
+    TMP="$(mktemp -d)"
+    cp -r "$REPO/driver/core" "$TMP/core"
     if ! MUT="$m" DIR="$TMP/core" "$PY" - <<'EOF'
 import os, sys
 file, old, new = os.environ["MUT"].split("@@")

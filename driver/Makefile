@@ -13,7 +13,11 @@ CFLAGS := -O2 -g -std=gnu11 $(WARN) -Icore -Iqnx
 CORE := core/pb_vring.c core/pb_i2c.c core/pb_spi.c
 CORE_H := $(wildcard core/*.h)
 
-all: $(OUT)/i2c-virtio $(OUT)/spi-virtio
+all: $(OUT)/i2c-virtio $(OUT)/spi-virtio $(OUT)/pbprobe
+
+$(OUT)/pbprobe: tools/pbprobe.c
+	@mkdir -p $(OUT)
+	$(QCC) $(CFLAGS) -o $@ tools/pbprobe.c
 
 $(OUT)/i2c-virtio: qnx/i2c-virtio.c qnx/pb_vpci.c core/pb_vring.c core/pb_i2c.c qnx/pb_vpci.h $(CORE_H)
 	@mkdir -p $(OUT)

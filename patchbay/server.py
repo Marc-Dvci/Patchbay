@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from typing import Protocol, TextIO
 
 from . import vhost_user as vu
+from .clock import FreezableClock
 from .faults import Fault, FaultPlan
 from .memory import GuestMemory, MemoryFault, Region
 from .vring import DeviceRing, RingError
@@ -67,6 +68,7 @@ class Connection:
     maps: list[mmap.mmap] = field(default_factory=list)
     queues: list[Queue] = field(default_factory=list)
     broken: bool = False
+    debug: bool = field(default_factory=lambda: bool(os.environ.get("PATCHBAY_DEBUG")))
 
     def __post_init__(self) -> None:
         self.queues = [Queue() for _ in range(self.device.num_queues)]
@@ -109,6 +111,12 @@ class Connection:
 
     def handle(self, msg: vu.Message, fds: list[int]) -> None:
         """Apply one message. Any fd not kept is closed."""
+        if self.debug:
+            try:
+                name = vu.Req(msg.req).name
+            except ValueError:
+                name = str(msg.req)
+            self.say(f"<- {name} flags={msg.flags:#x} size={len(msg.payload)} fds={len(fds)}")
         kept: set[int] = set()
         replied = False
         try:
@@ -285,15 +293,26 @@ class Server:
         faults: FaultPlan,
         control_path: str | None,
         log: TextIO = sys.stdout,
+        clock: FreezableClock | None = None,
+        connect: bool = False,
     ) -> None:
+        """connect=False: listen on each device's socket path, QEMU connects (QEMU's default, client mode).
+        connect=True: QEMU listens (server=on) and this back end connects, and connects again after losing the
+        connection, so a back end that restarts is picked up by the running guest."""
         self.devices = devices
         self.faults = faults
         self.log = log
+        self.clock = clock
+        self.connect = connect
+        self.retry_at: dict[str, float] = {}
         self.sel = selectors.DefaultSelector()
         self.listeners: dict[str, socket.socket] = {}
         self.conns: dict[str, Connection] = {}
         self.running = True
         for name, (path, _dev) in devices.items():
+            if connect:
+                self.retry_at[name] = 0.0
+                continue
             self.listeners[name] = self._listen(path)
             self.sel.register(self.listeners[name], selectors.EVENT_READ, ("listen", name))
         self.control: socket.socket | None = None
@@ -303,8 +322,9 @@ class Server:
 
     @staticmethod
     def _listen(path: str) -> socket.socket:
+        """A new listening socket. An existing path is refused rather than removed: give each run its own path."""
         if os.path.exists(path):
-            os.unlink(path)
+            raise FileExistsError(f"{path} exists; choose a new socket path")
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         s.bind(path)
         s.listen(1)
@@ -316,6 +336,7 @@ class Server:
     def run(self) -> None:
         self.say("ready: " + ", ".join(f"{n} on {p}" for n, (p, _) in self.devices.items()))
         while self.running:
+            self._retry_connects()
             timeout = self._timeout()
             for key, _ev in self.sel.select(timeout):
                 kind, name = key.data
@@ -337,16 +358,36 @@ class Server:
 
     def _timeout(self) -> float | None:
         deadlines = [d for c in self.conns.values() if (d := c.device.next_deadline()) is not None]
+        deadlines += list(self.retry_at.values())
         if self.faults.faults and any(f.kind == "stuck" for f in self.faults.faults):
             return 0.2  # a stuck fault may be cleared from the control socket; look again soon
         if not deadlines:
             return None
         return max(0.0, min(deadlines) - time.monotonic())
 
+    def _retry_connects(self) -> None:
+        now = time.monotonic()
+        for name, at in list(self.retry_at.items()):
+            if at > now:
+                continue
+            path, dev = self.devices[name]
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                sock.connect(path)
+            except OSError:
+                sock.close()
+                self.retry_at[name] = now + 0.2
+                continue
+            del self.retry_at[name]
+            self._attach(name, sock)
+
     def _accept(self, name: str) -> None:
         sock, _ = self.listeners[name].accept()
         if name in self.conns:
             self._drop(name)
+        self._attach(name, sock)
+
+    def _attach(self, name: str, sock: socket.socket) -> None:
         _path, dev = self.devices[name]
         self.conns[name] = Connection(name, sock, dev, self.log)
         self.sel.register(sock, selectors.EVENT_READ, ("msg", name))
@@ -361,6 +402,8 @@ class Server:
                 pass
         conn.close()
         self.say(f"{name}: front end gone")
+        if self.connect:
+            self.retry_at[name] = time.monotonic() + 0.5
 
     def _message(self, name: str) -> None:
         conn = self.conns[name]
@@ -440,6 +483,15 @@ class Server:
                         "failed": getattr(dev, "failed", 0),
                     }
                 return out
+            if cmd in ("freeze", "thaw"):
+                if self.clock is None:
+                    return {"ok": False, "error": "this back end's clock cannot be frozen"}
+                if cmd == "freeze":
+                    self.clock.freeze()
+                else:
+                    self.clock.thaw()
+                self.say(f"simulated time {'stopped' if cmd == 'freeze' else 'running'}")
+                return {"ok": True}
             if cmd == "stop":
                 self.running = False
                 return {"ok": True}
