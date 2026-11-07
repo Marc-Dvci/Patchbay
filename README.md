@@ -19,7 +19,7 @@ simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM,
 | Track | Low-level Software (device drivers with the QNX DDK) |
 | Built with | QNX SDP 8.0 (`qcc`, `libi2c-master.a`, `libio-spi.a`, `libpci`), QEMU 11.1.3 vhost-user, Python 3.12 |
 | Target | QNX 8.0 x86_64 guest in QEMU (also builds for aarch64le) |
-| Headline | 3 unmodified QNX samples run on simulated BNO055, SHT3x and MCP3008; 15 of 16 fault rows as expected ([results](docs/RESULTS.md)) |
+| Headline | 3 unmodified QNX samples run on simulated BNO055, SHT3x and MCP3008; 16 of 16 fault rows as expected ([results](docs/RESULTS.md)) |
 
 [For judges](#for-judges) · [The patch panel](#the-patch-panel) · [Run it](#build-and-run) ·
 [How it works](#how-it-works) · [Evidence](#evidence) · [Limitations](#what-it-does-not-do)
@@ -133,7 +133,7 @@ All figures and their commands are in [`docs/RESULTS.md`](docs/RESULTS.md). In s
 | Claim | Command | Test or file |
 |---|---|---|
 | The three samples run unmodified | `scripts/evidence.sh` | `docs/results/sample_*.txt` |
-| 15 of 16 fault rows behave as expected, drivers keep running | `python3 scripts/fault_matrix.py` | `docs/results/fault_matrix.md` |
+| 16 of 16 fault rows behave as expected; 15 keep the driver running, the 16th is a stopped guest | `python3 scripts/fault_matrix.py` | `docs/results/fault_matrix.md` |
 | The C ring and framing agree with an independent Python device | `scripts/host_tests.sh` | `tests/cross/` |
 | A recorded panel session from a real guest replays with no QNX | `python3 -m patchbay panel --recorded` | `tests/unit/test_panel.py` |
 | The panel has no WCAG 2.2 AA violations (axe-core) and works from the keyboard | `pytest tests/e2e` | `tests/e2e/test_panel_browser.py` |

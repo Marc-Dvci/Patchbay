@@ -53,7 +53,7 @@ The back end's view of the same bus: [`results/backend_trace_tail.txt`](results/
 **The last row: the back end process stopped.** The outcome is a stopped guest. With the back end killed, QEMU 11.1.3
 was still running right after the kill, and exited once the first I2C transfer used the device: the ssh session
 closed and QEMU was gone within the check's 30 seconds (the row's observed column in
-[esults/fault_matrix.md](results/fault_matrix.md)). That
+[results/fault_matrix.md](results/fault_matrix.md)). That
 is how QEMU handles a vhost-user device whose back end goes away. No recovery is promised or tested
 (requirement R5.3, R5.4); "a device that disappears" is covered by the per-chip unplug rows and by the stuck rows (a
 controller that stops answering).
