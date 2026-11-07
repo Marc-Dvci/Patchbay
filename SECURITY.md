@@ -2,15 +2,13 @@
 
 Please report a vulnerability through
 [GitHub's private reporting](https://github.com/Marc-Dvci/Patchbay/security/advisories/new), not in a public issue.
-The supported version is the `main` branch and the hosted [live demo]({{LIVE_URL}}).
+The supported version is the `main` branch.
 
-The reports that matter most are anything that:
+Patchbay has no hosted service. What it exposes on the machine that runs it:
 
-<!-- TEMPLATE: list what the product promises; delete this file if there is no public endpoint, keys, money or
-personal data. -->
-- reads the server's API keys;
-- spends API credit past the live server's budget;
-- changes a stored result without the product noticing.
+- the drivers `i2c-virtio` and `spi-virtio` inside a QNX guest, which parse what the virtio device returns;
+- the back end's vhost-user and control sockets, Unix sockets in the user's own working directory;
+- the patch panel, an HTTP server bound to 127.0.0.1 only, which validates every fault request before passing it on.
 
-To dispute what an output says, rather than how the software works,
-[report a correction](https://github.com/Marc-Dvci/Patchbay/issues/new?template=correction.yml).
+The reports that matter most: a device answer that makes a driver crash, hang or write outside its buffers, and a
+request to the back end or the panel that reaches memory or files it should not.

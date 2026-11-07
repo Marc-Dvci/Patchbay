@@ -1,16 +1,23 @@
 cff-version: 1.2.0
-message: "If you use Patchbay or its evaluation, please cite it as below."
+message: "If you use Patchbay, please cite it as below."
 type: software
 title: "Patchbay: Virtio I2C and SPI drivers for QNX, so QNX's sensor samples run without a board"
 abstract: >-
-  {{ABSTRACT}}
+  Virtio I2C and SPI master drivers for QNX 8.0, built on the QNX Driver Development Kit (libi2c-master and
+  libio-spi), with a vhost-user back end that simulates a BNO055, an SHT3x and an MCP3008 from their data sheets and
+  injects bus faults, so QNX's own sensor samples run unmodified in a QEMU guest.
 authors:
   - family-names: Donovici
     given-names: Marc
 version: 1.0.0
-date-released: "{{RELEASE_DATE}}"
 license: MIT
 repository-code: "https://github.com/Marc-Dvci/Patchbay"
-url: "{{DEMO_URL}}"
 keywords:
-  - "{{KEYWORD}}"
+  - QNX
+  - device drivers
+  - virtio
+  - I2C
+  - SPI
+  - vhost-user
+  - QEMU
+  - fault injection

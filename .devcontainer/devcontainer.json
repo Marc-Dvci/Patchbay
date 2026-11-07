@@ -1,12 +1,12 @@
 {
   "name": "Patchbay",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
-  "postCreateCommand": "pip install -r requirements.txt",
-  "postStartCommand": "nohup bash -c 'APP_DEMO=1 python -m uvicorn app.server:app --host 0.0.0.0 --port 8787 > /tmp/demo.log 2>&1 &'",
-  "forwardPorts": [8787],
+  "postCreateCommand": "pip install -r requirements-dev.txt",
+  "postStartCommand": "nohup python -m patchbay panel --recorded --port 8093 > /tmp/panel.log 2>&1 &",
+  "forwardPorts": [8093],
   "portsAttributes": {
-    "8787": {
-      "label": "Patchbay demo",
+    "8093": {
+      "label": "Patchbay patch panel (recorded session)",
       "onAutoForward": "openBrowser"
     }
   },
