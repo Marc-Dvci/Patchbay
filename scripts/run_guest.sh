@@ -132,5 +132,14 @@ case "${1:-start}" in
         if alive "$RUN/backend.pid"; then kill "$(cat "$RUN/backend.pid")"; fi ;;
     ssh) shift; ssh_guest "$@" ;;
     ctl) shift; ctl "$@" ;;
+    panel)
+        # The patch panel, live: QNX's three samples run in the guest, their output streams into $RUN/samples-*/
+        samples="$RUN/samples-$(date +%Y%m%d-%H%M%S)"
+        mkdir -p "$samples"
+        for s in imu-bno055 temp-humidity-sht3x mcp-3008-joystick; do
+            ssh_guest "d=/tmp/panel-$s-\$\$; mkdir -p \$d && cd \$d && exec $s" >"$samples/$s.log" 2>&1 &
+        done
+        PYTHONPATH="$REPO" "$PY" -m patchbay panel --control "$(cat "$RUN/control.path")" \
+            --events "$(cat "$RUN/events.path")" --samples "$samples" --port "${PANEL_PORT:-8093}" ;;
     *) echo "usage: $0 start|stop|ssh CMD|ctl ARGS" >&2; exit 64 ;;
 esac
