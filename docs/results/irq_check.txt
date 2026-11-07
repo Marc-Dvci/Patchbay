@@ -1,3 +1,5 @@
+# QEMU, TCG, guest clock, diagnostic only. Raw pbprobe output taken after the interrupt fix, with the periodic
+# re-check off. It shows which wake-up completed each transfer; it is not a timing result.
 spi-xchg dev=0 tx=018000 rc=EOK data=000301 guest_ms=2
 spi-xchg dev=0 tx=018000 rc=EOK data=000301 guest_ms=0
 spi-xchg dev=0 tx=018000 rc=EOK data=000300 guest_ms=0

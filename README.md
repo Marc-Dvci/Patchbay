@@ -120,7 +120,7 @@ transfer fails with EIO (I2C) or ETIMEDOUT (SPI), and the next transfer starts o
 - virtio-i2c reports one error status, so the driver cannot tell an address NAK from a data NAK; both are EIO.
 - 7-bit I2C addresses only; 8-bit SPI words (the back end offers 8; the driver passes 16 or 32 to a controller that offers them); no SPI DMA hooks: transfers already use the virtqueue's DMA memory.
 - The simulated chips follow their data sheets for what the samples use; what each model leaves out is listed at the top of its source file.
-- When the back end process stops, QEMU 11.1.3 exits too, so the case of a back end that goes away and comes back cannot be tested ([RESULTS](docs/RESULTS.md#fault-matrix)).
+- When the back end process stops, the guest stops with it: QEMU 11.1.3 exits when a driver first uses the device, and aborts if a back end reconnects. Recovery after a lost back end is neither offered nor tested ([RESULTS](docs/RESULTS.md#fault-matrix)).
 
 > [!IMPORTANT]
 > Real: the QNX drivers, the QNX sample binaries, the virtio devices in QEMU. Simulated: the chips behind the buses,

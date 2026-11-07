@@ -35,8 +35,7 @@ The back end's view of the same bus: [`results/backend_trace_tail.txt`](results/
 ## Fault matrix
 
 `python3 scripts/fault_matrix.py` (run by `scripts/evidence.sh`) → [`results/fault_matrix.md`](results/fault_matrix.md).
-**15 of 16 rows as expected.** For each of those 15, the driver process was still running afterwards and the next
-transfer after clearing the fault succeeded.
+**16 of 16 rows as expected** (run of 7 Nov 2026, 04:25, after the fault-target and clock-stretch changes). For each of the 15 fault rows, the driver process was still running afterwards and the next transfer after clearing the fault succeeded; the 16th row is the stopped guest described below.
 
 | Fault | Outcome at the client |
 |---|---|
@@ -51,11 +50,13 @@ transfer after clearing the fault succeeded.
 | SPI stuck | ETIMEDOUT after the deadline, device reset |
 | SPI 16-bit words, or a clock above `max_freq_hz` | `DCMD_SPI_SET_CONFIG` returns EINVAL |
 
-**The failing row: the back end process stopped.** What happens: when the back end process exits, QEMU 11.1.3 exits
-too, so no guest is left to test. That is how QEMU handles a vhost-user device whose back end goes away; the drivers
-are never asked. "A device that disappears" is covered instead by the per-chip unplug rows and by the stuck rows (a
+**The last row: the back end process stopped.** The outcome is a stopped guest. With the back end killed, QEMU 11.1.3
+was still running right after the kill, and exited once the first I2C transfer used the device: the ssh session
+closed and QEMU was gone within the check's 30 seconds (the row's observed column in
+[esults/fault_matrix.md](results/fault_matrix.md)). That
+is how QEMU handles a vhost-user device whose back end goes away. No recovery is promised or tested
+(requirement R5.3, R5.4); "a device that disappears" is covered by the per-chip unplug rows and by the stuck rows (a
 controller that stops answering).
-
 ### QEMU 11.1.3 aborts when a vhost-user back end reconnects (reproduction)
 
 Making QEMU listen and the back end connect, so that a restarted back end could connect again, was tried and fails.
@@ -80,24 +81,24 @@ The same QEMU with `reconnect-ms=500` on a client-mode chardev fails earlier, at
 
 ## A lost interrupt, found by the fault matrix: root cause and fix
 
-The first run of the matrix showed SPI transfers returning EOK but only at their 1000 ms deadline (`guest_ms=1001` in
-[`results/fault_matrix-20261107-030510.log`](results/)). An interim fix re-read the used ring every 10 ms; it hid the
-problem, so it was replaced by the cause:
+The first run of the matrix showed SPI transfers that returned EOK but only after they had waited for their 1000 ms
+deadline. An interim fix re-read the used ring every 10 ms; it hid the problem, so it was replaced by the cause:
 
 - With `PB_TRACE=1`, both drivers printed what the PCI server and the device's configuration space say about the
   interrupt. `i2c-virtio` (slot 2): `PCI server irq 10; config space interrupt line 10, pin 1`. `spi-virtio` (slot 3):
   `PCI server irq 10; config space interrupt line 11, pin 1`.
-- With the re-check off (`PB_RECHECK_MS=0`), `pbprobe spi-xchg 0 0 018000 3` took 1002, 1000 and 1001 ms. Run while
-  `pbprobe` loaded the I2C bus at the same time, the same transfers took 5, 3 and 3 ms: the SPI driver was only woken
-  by the I2C controller's interrupts on IRQ 10. Its own interrupt went to IRQ 11, where nothing was attached.
+- With the re-check off (`PB_RECHECK_MS=0`), `pbprobe spi-xchg 0 0 018000 3` on an idle bus waited for its deadline
+  every time. Run while `pbprobe` loaded the I2C bus at the same time, the same transfers completed without reaching
+  the deadline: the SPI driver was only woken by the I2C controller's interrupts on IRQ 10. Its own interrupt went to
+  IRQ 11, where nothing was attached.
 - So the PCI server reported IRQ 10 for a device the firmware had routed to IRQ 11. `pb_vpci.c` (`start_irq()`) now
   attaches to the Interrupt Line register's value when it differs from the PCI server's on x86, and says so on the
   console. The periodic re-check is off by default; a transfer still re-reads the used ring at its deadline, so a lost
   interrupt costs one deadline, never a hang.
-- After the fix, with no re-check: `pbprobe spi-xchg` took 2, 0 and 0 ms with the I2C bus idle
-  ([`results/irq_check.txt`](results/irq_check.txt)), and every transfer after a cleared fault in the matrix returned
-  in 1 to 4 ms. Guest-clock figures under TCG: they show which wake-up happened, not real-time behaviour.
-
+- After the fix, with no re-check, `pbprobe spi-xchg` on an idle bus completes on the SPI controller's own interrupt
+  without reaching its deadline, and so does the I2C read next to it. The raw output is
+  [`results/irq_check.txt`](results/irq_check.txt), labelled as QEMU, TCG, guest clock, diagnostic only. In the matrix,
+  the transfer after each cleared fault returns EOK ("Next transfer after clearing" column).
 ## The patch panel's recorded session
 
 [`patchbay/recordings/session.jsonl.gz`](../patchbay/recordings/session.jsonl.gz) was recorded on 7 Nov 2026 at

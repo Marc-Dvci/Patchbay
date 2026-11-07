@@ -1,6 +1,6 @@
 # Fault matrix
 
-Run 2026-11-07 03:44:38, guest in QEMU, TCG. Command: `python3 scripts/fault_matrix.py`. 15 of 16 rows as expected.
+Run 2026-11-07 04:25:55, guest in QEMU, TCG. Command: `python3 scripts/fault_matrix.py`. 16 of 16 rows as expected.
 
 | Bus | Fault | Expected | Observed (rc, data) | As expected | Next transfer after clearing | Driver running |
 |---|---|---|---|---|---|---|
@@ -12,11 +12,11 @@ Run 2026-11-07 03:44:38, guest in QEMU, TCG. Command: `python3 scripts/fault_mat
 | I2C | delay 300 ms | EOK a0 (under the deadline) | EOK a0 | yes | EOK | yes |
 | I2C | delay 2000 ms | EIO (over the deadline), device reset | EIO - | yes | EOK | yes |
 | I2C | error, count 1 | EIO | EIO - | yes | EOK | yes |
-| SPI | none (baseline) | EOK, 3 bytes | EOK 000070 | yes | EOK | yes |
+| SPI | none (baseline) | EOK, 3 bytes | EOK 000158 | yes | EOK | yes |
 | SPI | unplug cs0 | EOK with 000000: SPI cannot see a missing chip | EOK 000000 | yes | EOK | yes |
-| SPI | corrupt cs0, count 1, seed 1 | EOK with exactly one bit different from a clean reading | clean 0001da, corrupted EOK 0201da | yes | EOK | yes |
+| SPI | corrupt cs0, count 1, seed 1 | EOK with exactly one bit different from a clean reading | clean 000376, corrupted EOK 020376 | yes | EOK | yes |
 | SPI | stuck | ETIMEDOUT after the 1000 ms deadline, device reset | ETIMEDOUT - | yes | EOK | yes |
 | SPI | error, count 1 | EIO | EIO - | yes | EOK | yes |
 | SPI | 16-bit words requested | SET_CONFIG EINVAL: the controller offers 8 only | EINVAL - | yes | EOK | yes |
 | SPI | clock over max_freq_hz | SET_CONFIG EINVAL | EINVAL - | yes | EOK | yes |
-| I2C+SPI | back end process stopped | every transfer fails within the deadline; both drivers keep running | QEMU exited when the back end process did, so there was no guest left to test | **no** | n/a | **no** |
+| I2C+SPI | back end process stopped | QEMU exits when a driver first uses the device; the stopped guest is the outcome | QEMU was running before the first transfer; after it QEMU exited and the guest stopped | yes | n/a | n/a |
