@@ -32,9 +32,9 @@ HOST := build/host
 
 host: $(HOST)/libpbcore.so $(HOST)/test_core
 
-$(HOST)/libpbcore.so: $(CORE) $(CORE_H)
+$(HOST)/libpbcore.so: $(CORE) $(CORE_H) tests/pb_host_shim.c
 	@mkdir -p $(HOST)
-	$(HOSTCC) $(HOSTFLAGS) -shared -o $@ $(CORE)
+	$(HOSTCC) $(HOSTFLAGS) -shared -o $@ $(CORE) tests/pb_host_shim.c
 
 $(HOST)/test_core: tests/test_core.c $(CORE) $(CORE_H)
 	@mkdir -p $(HOST)
