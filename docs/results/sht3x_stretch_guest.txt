@@ -1,0 +1,26 @@
+# QEMU, TCG. temp-humidity-sht3x, the unmodified QNX sample, after the SHT3x clock-stretch change.
+guest up after 9 s (QEMU, TCG); console: /home/dev/Patchbay-work/run/console-20261107-040840.log
+## sample output
+Temp: 22.54°C, Humidity: 45.20%
+Temp: 22.55°C, Humidity: 45.21%
+Temp: 22.55°C, Humidity: 45.22%
+Temp: 22.55°C, Humidity: 45.23%
+Temp: 22.55°C, Humidity: 45.24%
+Temp: 22.56°C, Humidity: 45.26%
+Temp: 22.56°C, Humidity: 45.27%
+Temp: 22.56°C, Humidity: 45.28%
+Temp: 22.56°C, Humidity: 45.29%
+Temp: 22.57°C, Humidity: 45.30%
+Temp: 22.57°C, Humidity: 45.31%
+Temp: 22.57°C, Humidity: 45.33%
+Temp: 22.58°C, Humidity: 45.34%
+Temp: 22.58°C, Humidity: 45.35%
+Temp: 22.58°C, Humidity: 45.36%
+Temp: 22.58°C, Humidity: 45.37%
+## back end, last SHT3x (0x44) transactions
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
