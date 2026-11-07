@@ -293,14 +293,15 @@ static int bring_up(struct pb_vpci *v, uint16_t max_qsize, char *err, size_t err
     return EOK;
 }
 
-/* How often a waiting transfer re-reads the used ring without an interrupt. PB_RECHECK_MS overrides the default
- * (0 turns the re-check off), for diagnosing interrupt delivery. */
+/* A waiting transfer wakes on its interrupt or at its deadline; the used ring is read once more at the deadline, so a
+ * lost interrupt costs one deadline, never a hang. PB_RECHECK_MS=N also re-reads the ring every N ms, for diagnosing
+ * interrupt delivery; it is off by default. */
 static uint64_t recheck_ns(void)
 {
     static int64_t ns = -1;
     if (ns < 0) {
         const char *e = getenv("PB_RECHECK_MS");
-        ns = (int64_t)(e != NULL ? strtoul(e, NULL, 0) : 10ul) * 1000000;
+        ns = (int64_t)(e != NULL ? strtoul(e, NULL, 0) : 0ul) * 1000000;
     }
     return (uint64_t)ns;
 }
@@ -349,6 +350,17 @@ static int start_irq(struct pb_vpci *v)
     pci_device_cfg_rd8(v->bdf, 0x3C, &line);
     pci_device_cfg_rd8(v->bdf, 0x3D, &pin);
     trace("PCI server irq %d; config space interrupt line %u, pin %u", irq, line, pin);
+    /* On QEMU's pc machine the PCI server reported IRQ 10 for both Patchbay controllers, while the firmware had routed
+     * the one in slot 3 to IRQ 11 and written 11 in its Interrupt Line register: its interrupts never reached IRQ 10,
+     * and a transfer was only seen when another device's interrupt on 10 woke this driver (docs/RESULTS.md). For a
+     * legacy INTx line on x86 the register is what the firmware actually programmed, so it wins when they differ. */
+#if defined(__X86_64__) || defined(__x86_64__)
+    if (pin != 0u && line != 0u && line < 0xFFu && (int)line != irq) {
+        fprintf(stderr, "pb_vpci: PCI server says IRQ %d, Interrupt Line register says %u: using %u\n", irq, line,
+                line);
+        v->irq = line;
+    }
+#endif
     if (pthread_create(&v->irq_thread, NULL, irq_loop, v) != EOK) {
         return -1;
     }
@@ -356,8 +368,8 @@ static int start_irq(struct pb_vpci *v)
     pthread_setname_np(v->irq_thread, "virtio-irq");
     struct sigevent ev;
     SIGEV_PULSE_INIT(&ev, v->coid, IRQ_PRIORITY, PULSE_IRQ, 0);
-    v->iid = InterruptAttachEvent(irq, &ev, _NTO_INTR_FLAGS_TRK_MSK);
-    trace("irq %d attached as %d", irq, v->iid);
+    v->iid = InterruptAttachEvent(v->irq, &ev, _NTO_INTR_FLAGS_TRK_MSK);
+    trace("irq %d attached as %d", v->irq, v->iid);
     return v->iid >= 0 ? 0 : -1;
 }
 
@@ -529,8 +541,6 @@ int pb_vpci_run(struct pb_vpci *v, const uint16_t *heads, unsigned n, uint32_t *
         }
         uint64_t left = deadline - t;
         if (v->iid >= 0) {
-            /* Wake on the interrupt, or after 10 ms at most: on the shared INTx line an interrupt can go missing
-             * (seen with spi-virtio, see docs/RESULTS.md), and then the used ring is read again anyway. */
             uint64_t step = recheck_ns();
             uint64_t wake = step != 0u && t + step < deadline ? t + step : deadline;
             struct timespec abs = { .tv_sec = (time_t)(wake / 1000000000ull),

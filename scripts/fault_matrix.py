@@ -318,7 +318,9 @@ def backend_gone_check() -> tuple[bool, str]:
         text=True,
     ).stdout.strip()
     raw = " | ".join(x.raw[:80] for x in a + b if x.rc == "no-answer")
-    return ok, "; ".join(f"{x.op} {x.rc}" for x in a + b) + f"; QEMU process {qemu}" + (f"; raw: {raw}" if raw else "")
+    if qemu == "gone":
+        return ok, "QEMU exited when the back end process did, so there was no guest left to test"
+    return ok, "; ".join(f"{x.op} {x.rc}" for x in a + b) + (f"; raw: {raw}" if raw else "")
 
 
 def main() -> int:
