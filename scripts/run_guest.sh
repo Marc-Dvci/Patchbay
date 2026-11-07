@@ -61,7 +61,7 @@ start_backend() {
     BACKEND_LOG="$RUN/backend-$stamp.log"
     echo "$s/control-$stamp.sock" >"$RUN/control.path"
     PYTHONPATH="$REPO" nohup "$PY" -m patchbay serve --i2c "$s/i2c.sock" --spi "$s/spi.sock" \
-        --control "$s/control-$stamp.sock" --connect --trace >"$BACKEND_LOG" 2>&1 &
+        --control "$s/control-$stamp.sock" --trace >"$BACKEND_LOG" 2>&1 &
     echo $! >"$RUN/backend.pid"
     ln -sf "$BACKEND_LOG" "$RUN/backend.log"
     for _ in $(seq 50); do grep -q 'ready:' "$BACKEND_LOG" 2>/dev/null && return; sleep 0.1; done
@@ -80,20 +80,20 @@ start_guest() {
     local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
     CONSOLE="$RUN/console-$stamp.log"
     ln -sf "$CONSOLE" "$RUN/console.log"
-    local spi=() srv=server=on,wait=off s
+    local spi=() s
     s="$(session)"
     if has_device vhost-user-spi-pci; then
         # shellcheck disable=SC2054  # the commas belong to QEMU's option syntax
-        spi=(-chardev "socket,id=vspi,path=$s/spi.sock,$srv" -device vhost-user-spi-pci,chardev=vspi)
+        spi=(-chardev "socket,id=vspi,path=$s/spi.sock" -device vhost-user-spi-pci,chardev=vspi)
     else
         echo "note: $QEMU has no vhost-user-spi-pci (QEMU 11.0 or later has it); SPI is left out" >&2
     fi
-    # QEMU listens on the device sockets and the back end connects (patchbay serve --connect): when the back end
-    # restarts it connects again, and QEMU restarts the queues of the running guest.
-    # timeout: QEMU's start blocks until the back end connects; give up rather than wait forever
+    # QEMU connects to the back end's sockets. QEMU 11.1.3 does not survive a back end that goes away and comes back
+    # (server mode aborts in memory_region_del_eventfd), so a stopped back end stays stopped for this guest.
+    # timeout: QEMU's start blocks until the back end answers; give up rather than wait forever
     timeout 120 "$QEMU" -accel tcg,thread=multi -machine pc,memory-backend=mem -cpu max -smp 2 -m 1G \
         -object memory-backend-memfd,id=mem,size=1G,share=on \
-        -chardev "socket,id=vi2c,path=$s/i2c.sock,$srv" -device vhost-user-i2c-pci,chardev=vi2c \
+        -chardev "socket,id=vi2c,path=$s/i2c.sock" -device vhost-user-i2c-pci,chardev=vi2c \
         "${spi[@]}" \
         -drive "file=$IMAGE/disk-qemu.vmdk,if=ide,id=drv0,snapshot=on" \
         -netdev "user,id=net0,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" -device virtio-net-pci,netdev=net0 \
