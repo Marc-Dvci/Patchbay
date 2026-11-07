@@ -68,7 +68,10 @@ def main() -> int:
     def stream(name: str) -> None:
         d = f"/tmp/rec-{name}-{int(time.time())}"
         cmd = f"mkdir -p {d} && cd {d} && exec {name}"
-        proc = subprocess.Popen([str(RUN), "ssh", cmd], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # a terminal in the guest: the samples print with printf, which is line-buffered only on a terminal
+        proc = subprocess.Popen(
+            [str(RUN), "ssh-tty", cmd], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        )
         assert proc.stdout is not None
         buf = b""
         while True:

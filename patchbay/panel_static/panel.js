@@ -65,9 +65,9 @@
       if (state.stuck[c.bus]) cls.push("stuck");
       let d, end;
       if (state.pulled[c.id]) {
-        // the plug hangs loose below the bus, beside the empty chip jack
-        end = [x2 - 70, y2 + 62];
-        d = `M ${x1} ${y1} C ${x1} ${y1 + 210}, ${end[0] - 40} ${end[1] + 30}, ${end[0]} ${end[1]}`;
+        // the plug hangs loose below and to the left of the empty chip jack, clear of its lamp and label
+        end = [x2 - 45, y2 + 72];
+        d = `M ${x1} ${y1} C ${x1} ${y1 + 120}, ${x2 - 130} ${y2 + 30}, ${end[0]} ${end[1]}`;
         cls.push("pulled");
       } else {
         end = [x2, y2];
