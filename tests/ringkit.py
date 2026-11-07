@@ -15,11 +15,11 @@ BASE = 0x100000
 
 
 class Arena:
-    """size bytes of guest memory at guest-physical BASE, with a bump allocator."""
+    """size bytes of guest memory at guest-physical BASE, with a bump allocator. buf may be shared memory (an mmap)."""
 
-    def __init__(self, size: int = 1 << 18, base: int = BASE) -> None:
+    def __init__(self, size: int = 1 << 18, base: int = BASE, buf: bytearray | memoryview | None = None) -> None:
         self.base = base
-        self.buf = bytearray(size)
+        self.buf = buf if buf is not None else bytearray(size)
         self.top = 0
         self.mem = GuestMemory([Region(base, size, 0x7F0000000000 + base, memoryview(self.buf))])
 
