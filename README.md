@@ -141,7 +141,7 @@ All figures and their commands are in [`docs/RESULTS.md`](docs/RESULTS.md). In s
 | Chip models match their data sheets' examples (CRC-8 0xBEEF → 0x92, BNO055 IDs, MCP3008 bit order) | `scripts/host_tests.sh` | `tests/unit/test_sht3x.py`, `test_bno055.py`, `test_mcp3008.py` |
 
 Tests: 17 C unit tests (106 checks, under ASan and UBSan) · 150 Python unit · 13 cross · 19 integration ·
-4 browser. Back end coverage, lines and branches: 89 %.
+5 browser. Back end coverage, lines and branches: 89 %.
 
 ## Build and run
 

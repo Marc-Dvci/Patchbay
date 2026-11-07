@@ -3,8 +3,43 @@
 // guest or the back end is put on the page with textContent, never as markup.
 (function () {
   const SVG = "http://www.w3.org/2000/svg";
-  const BUS_POS = { i2c: [300, 135], spi: [860, 135] };
-  const CHIP_POS = { bno055: [190, 335], sht3x: [470, 335], mcp3008: [860, 335] };
+  // Two arrangements of the same panel. Wide: buses above, chips below, side by side. Narrow (the same breakpoint as
+  // panel.css): everything in one column so the labels stay a readable size on a phone.
+  const LAYOUTS = {
+    wide: {
+      view: "0 0 1200 430", plate: [10, 10, 1180, 410],
+      ears: [[34, 40], [34, 390], [1166, 40], [1166, 390]],
+      buses: { i2c: [300, 135], spi: [860, 135] },
+      chips: { bno055: [190, 335], sht3x: [470, 335], mcp3008: [860, 335] },
+      engBuses: [70, 52], engChips: [70, 262], rule: [70, 215, 1130, 215],
+    },
+    narrow: {
+      view: "0 0 470 620", plate: [10, 10, 450, 600],
+      ears: [[34, 36], [34, 584], [436, 36], [436, 584]],
+      buses: { i2c: [100, 110], spi: [100, 200] },
+      chips: { bno055: [100, 320], sht3x: [100, 420], mcp3008: [100, 520] },
+      engBuses: [62, 52], engChips: [62, 275], rule: [62, 245, 420, 245],
+      corridor: { bno055: -8, sht3x: 8, mcp3008: 24 },
+    },
+  };
+  const narrowQuery = window.matchMedia("(max-width: 760px)");
+  let L = narrowQuery.matches ? LAYOUTS.narrow : LAYOUTS.wide;
+  let BUS_POS = L.buses;
+  let CHIP_POS = L.chips;
+
+  function applyLayout() {
+    L = narrowQuery.matches ? LAYOUTS.narrow : LAYOUTS.wide;
+    BUS_POS = L.buses;
+    CHIP_POS = L.chips;
+    $("rack").setAttribute("viewBox", L.view);
+    const [px, py, pw, ph] = L.plate;
+    for (const [k, v] of Object.entries({ x: px, y: py, width: pw, height: ph })) $("plate").setAttribute(k, v);
+    [...$("ears").children].forEach((c, i) => { c.setAttribute("cx", L.ears[i][0]); c.setAttribute("cy", L.ears[i][1]); });
+    $("eng-buses").setAttribute("x", L.engBuses[0]); $("eng-buses").setAttribute("y", L.engBuses[1]);
+    $("eng-chips").setAttribute("x", L.engChips[0]); $("eng-chips").setAttribute("y", L.engChips[1]);
+    ["x1", "y1", "x2", "y2"].forEach((k, i) => $("rule").setAttribute(k, L.rule[i]));
+    if (topo) { drawJacks(); drawCords(); }
+  }
   const ROWS = 14;
   const LINES = 9;
 
@@ -64,7 +99,18 @@
       const cls = ["cord", c.bus];
       if (state.stuck[c.bus]) cls.push("stuck");
       let d, end;
-      if (state.pulled[c.id]) {
+      if (L.corridor) {
+        // narrow: the cord leaves its jack to the left and runs down a lane of its own beside the jacks
+        const cx = L.corridor[c.id];
+        if (state.pulled[c.id]) {
+          end = [x2 - 40, y2 + 50];
+          d = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2 + 50}, ${end[0]} ${end[1]}`;
+          cls.push("pulled");
+        } else {
+          end = [x2, y2];
+          d = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+        }
+      } else if (state.pulled[c.id]) {
         // the plug hangs loose below and to the left of the empty chip jack, clear of its lamp and label
         end = [x2 - 45, y2 + 72];
         d = `M ${x1} ${y1} C ${x1} ${y1 + 120}, ${x2 - 130} ${y2 + 30}, ${end[0]} ${end[1]}`;
@@ -263,8 +309,8 @@
       const m = s.meta || {};
       mode.textContent = `RECORDED SESSION, ${m.recorded || ""}, ${m.guest || ""}. Replayed, not live.`;
     }
-    drawJacks();
-    drawCords();
+    applyLayout();
+    narrowQuery.addEventListener('change', applyLayout);
     drawControls();
     buildColumns();
     tick();

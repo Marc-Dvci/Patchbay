@@ -1,7 +1,8 @@
 # On every push: the host side of Patchbay, with no QNX SDP, no guest and no network.
 #   C: the driver core built with the host compiler, its unit tests under AddressSanitizer and UBSan.
 #   Python: lint, format, strict types, the back end's unit, cross (C core against Python device) and integration
-#   tests with coverage, and the mutation check of the C core.
+#   tests with coverage, the patch panel in headless Chromium (Playwright, axe-core; a skipped browser test fails the
+#   run), and the mutation check of the C core.
 #   Shell scripts: shellcheck. Docs: spelling and local links.
 # The QNX build itself needs QNX SDP 8.0, which is licensed per developer and cannot be installed here; it is checked
 # locally with scripts/build_drivers.sh (see README, "Build and run").
@@ -24,6 +25,12 @@ jobs:
           cache: pip
           cache-dependency-path: requirements*.txt
       - run: pip install -r requirements-dev.txt
+      - name: Chromium for the browser tests
+        run: python -m playwright install --with-deps chromium
+      - name: axe-core for the accessibility test
+        run: |
+          npm install --prefix "$RUNNER_TEMP/axe" axe-core@4.10.2
+          echo "AXE_JS=$RUNNER_TEMP/axe/node_modules/axe-core/axe.min.js" >> "$GITHUB_ENV"
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy
@@ -32,6 +39,10 @@ jobs:
       - name: Python tests in random order, with line and branch coverage of the back end
         shell: bash
         run: python -m pytest -q --cov --cov-branch --randomly-seed="$GITHUB_RUN_ID" | tee pytest.log
+      - name: No test may be skipped (a missing browser or axe-core would skip the browser tests silently)
+        shell: bash
+        run: |
+          if grep -Eq '[0-9]+ skipped' pytest.log; then grep -E 'SKIPPED|skipped' pytest.log; exit 1; fi
       - name: Mutation check of the C core (each deliberate bug must fail a test)
         run: PYTHON=python bash scripts/mutation_check.sh | tee mutation.log
       - name: Summary on the run page
@@ -47,6 +58,7 @@ jobs:
             echo "| Python unit | $(count 'not cross and not integration and not guest') |"
             echo "| Cross (C core against the Python device) | $(count cross) |"
             echo "| Integration (vhost-user over sockets) | $(count integration) |"
+            echo "| Browser (patch panel in Chromium, axe-core) | $(count e2e) |"
             echo "| C unit | $(grep -Eo '^[0-9]+ tests' c-tests.log | grep -Eo '[0-9]+' || echo 0) |"
             echo
             grep -E "passed|failed" pytest.log | tail -n 1

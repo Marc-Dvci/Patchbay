@@ -89,6 +89,9 @@ button:disabled { color: #9aa3ad; cursor: not-allowed; background: #23282e; bord
   .mode { margin-left: 0; }
   main { padding: 0.6rem 1rem 1.5rem; }
   .columns { grid-template-columns: 1fr; }
+  #rack .engrave { font-size: 22px; letter-spacing: 5px; }
+  #rack .label { font-size: 26px; }
+  #rack .small { font-size: 17px; }
 }
 @media (prefers-reduced-motion: no-preference) {
   #rack .lamp { transition: fill 120ms; }

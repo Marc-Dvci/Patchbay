@@ -136,7 +136,7 @@ fixed. The aarch64le build (`make -C driver ARCH=aarch64le`) produces `i2c-virti
 | Python unit | 150 | device ring, vhost-user codec, BNO055, SHT3x, MCP3008, buses, faults, devices, decoder, panel API and replay |
 | Cross | 13 | the driver's C core (host build, ctypes) against the back end's Python device in shared memory |
 | Integration | 19 | the back end's vhost-user state machine over real sockets, memfd and eventfds, including headers and payloads that arrive in pieces; a panel fault button reaching the back end's control socket |
-| Browser (e2e) | 4 | the panel in headless Chromium: axe-core WCAG 2.2 AA at 1440 and 390 px (0 violations), recorded mode disables faults, a fault button from the keyboard |
+| Browser (e2e) | 5 | the panel in headless Chromium: axe-core WCAG 2.2 AA at 1440 and 390 px (0 violations), one column with readable rack labels at 390 px, recorded mode disables faults, a fault button from the keyboard |
 
 Coverage of the back end (`patchbay/`, lines and branches): 89 %. Mutation check (`scripts/mutation_check.sh`):
 9 deliberate bugs in the C core, 9 caught, with a control run of the unmodified core first.

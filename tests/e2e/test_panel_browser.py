@@ -102,3 +102,28 @@ def test_a_fault_button_works_from_the_keyboard(live_url: tuple[str, list[dict[s
             page.keyboard.press("Enter")
         browser.close()
     assert {"cmd": "fault", "kind": "unplug", "bus": "i2c", "target": 0x28} in sent
+
+
+def test_at_390_px_the_panel_is_one_column_with_rack_labels_at_a_readable_size(recorded_url: str) -> None:
+    with playwright.sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 390, "height": 900}, bypass_csp=True)
+        page.goto(recorded_url)
+        page.wait_for_function("document.querySelectorAll('#jacks .label').length === 5", timeout=15000)
+        got = page.evaluate(
+            """() => {
+              const rack = document.querySelector('#rack');
+              const scale = rack.getBoundingClientRect().width / rack.viewBox.baseVal.width;
+              const px = (sel) => Math.min(...[...document.querySelectorAll(sel)].map(
+                (e) => parseFloat(getComputedStyle(e).fontSize) * scale));
+              const labels = [...document.querySelectorAll('#jacks .label')].map((e) => e.getBoundingClientRect());
+              return {label: px('#jacks .label'), small: px('#jacks .small'),
+                      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                      viewBox: rack.getAttribute('viewBox'),
+                      sameColumn: new Set(labels.map((r) => Math.round(r.left))).size === 1};
+            }"""
+        )
+        browser.close()
+    assert got["viewBox"] == "0 0 470 620" and got["sameColumn"]
+    assert got["label"] >= 16 and got["small"] >= 12
+    assert got["overflow"] <= 0
