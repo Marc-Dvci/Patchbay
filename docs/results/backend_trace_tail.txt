@@ -1,40 +1,40 @@
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-i2c  0x44 W2 ok
-i2c  0x44 R6 ok
-spi  cs0 tx 018000 rx3 ok 00034b
-spi  cs0 tx 019000 rx3 ok 00038e
-spi  cs0 tx 018000 rx3 ok 0000f5
-spi  cs0 tx 019000 rx3 ok 000213
-spi  cs0 tx 018000 rx3 ok 0000f0
-spi  cs0 tx 019000 rx3 ok 00006d
-spi  cs0 tx 018000 rx3 ok 000346
-spi  cs0 tx 019000 rx3 ok 000246
+spi  cs0 tx 018000 rx3 ok 00034c
+spi  cs0 tx 019000 rx3 ok 00011f
+spi  cs0 tx 018000 rx3 ok 000362
+spi  cs0 tx 019000 rx3 ok 000142
+spi  cs0 tx 018000 rx3 ok 000373
+spi  cs0 tx 019000 rx3 ok 000167
+spi  cs0 tx 018000 rx3 ok 000381
+spi  cs0 tx 019000 rx3 ok 00018d
+spi  cs0 tx 018000 rx3 ok 00038b
+spi  cs0 tx 019000 rx3 ok 0001b5
+spi  cs0 tx 018000 rx3 ok 000391
+spi  cs0 tx 019000 rx3 ok 0001dd
+spi  cs0 tx 018000 rx3 ok 000393
+spi  cs0 tx 019000 rx3 ok 000206
+spi  cs0 tx 018000 rx3 ok 000391
+spi  cs0 tx 019000 rx3 ok 00022f
+spi  cs0 tx 018000 rx3 ok 00038a
+spi  cs0 tx 019000 rx3 ok 000257
+spi  cs0 tx 018000 rx3 ok 00037f
+spi  cs0 tx 019000 rx3 ok 00027f
+spi  cs0 tx 018000 rx3 ok 000371
+spi  cs0 tx 019000 rx3 ok 0002a5
+spi  cs0 tx 018000 rx3 ok 00035f
+spi  cs0 tx 019000 rx3 ok 0002c9
+spi  cs0 tx 018000 rx3 ok 000349
+spi  cs0 tx 019000 rx3 ok 0002eb
+spi  cs0 tx 018000 rx3 ok 000330
+spi  cs0 tx 019000 rx3 ok 00030b
+spi  cs0 tx 018000 rx3 ok 000313
+spi  cs0 tx 019000 rx3 ok 000328
+spi  cs0 tx 018000 rx3 ok 0002f4
+spi  cs0 tx 019000 rx3 ok 000342
+spi  cs0 tx 018000 rx3 ok 0002d2
+spi  cs0 tx 019000 rx3 ok 000359
+spi  cs0 tx 018000 rx3 ok 0002ae
+spi  cs0 tx 019000 rx3 ok 00036d
+spi  cs0 tx 018000 rx3 ok 000289
+spi  cs0 tx 019000 rx3 ok 00037c
+spi  cs0 tx 018000 rx3 ok 000262
+spi  cs0 tx 019000 rx3 ok 000388
