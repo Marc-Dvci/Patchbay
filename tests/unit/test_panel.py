@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import gzip
 import json
 from pathlib import Path
@@ -9,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from patchbay.clock import FakeClock
-from patchbay.panel import DEFAULT_FIXTURE, LiveSource, PanelApp, RecordedSource, load_fixture
+from patchbay.panel import DEFAULT_FIXTURE, LiveSource, PanelApp, RecordedSource, load_fixture, make_server, run_panel
 
 FIXTURE = [
     {"type": "meta", "label": "Recorded session", "recorded": "2026-11-07 03:40", "guest": "test"},
@@ -177,3 +178,27 @@ def test_the_committed_recording_replays_bus_traffic_faults_and_all_three_sample
     }
     assert any("CHIP_ID = 0xA0" in str(e.get("what")) for e in events)
     assert any(e["type"] == "fault" and e.get("fault", {}).get("kind") == "unplug" for e in events)
+
+
+def test_a_live_panel_refuses_to_listen_on_anything_but_loopback(capsys: pytest.CaptureFixture[str]) -> None:
+    args = argparse.Namespace(recorded=False, host="0.0.0.0", port=0, events="e", control="c", samples=None)
+    assert run_panel(args) == 2
+    assert "loopback" in capsys.readouterr().err
+
+
+def test_a_recorded_panel_can_listen_on_all_addresses_for_a_container(tmp_path: Path) -> None:
+    _, app = recorded_app(tmp_path)
+    srv = make_server(app, 0, "0.0.0.0")
+    try:
+        assert srv.server_address[0] == "0.0.0.0"
+    finally:
+        srv.server_close()
+
+
+def test_the_panel_listens_on_loopback_by_default(tmp_path: Path) -> None:
+    _, app = recorded_app(tmp_path)
+    srv = make_server(app, 0)
+    try:
+        assert srv.server_address[0] == "127.0.0.1"
+    finally:
+        srv.server_close()

@@ -85,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     pn.add_argument("--events", help="live: the back end's events file (serve --events)")
     pn.add_argument("--samples", help="live: directory of the guest samples' output, one <name>.log each")
     pn.add_argument("--port", type=int, default=8093)
+    pn.add_argument("--host", default="127.0.0.1", help="address to listen on; other than loopback needs --recorded")
     a = p.parse_args(argv)
 
     if a.cmd == "panel":

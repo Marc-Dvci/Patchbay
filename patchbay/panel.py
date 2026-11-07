@@ -3,8 +3,9 @@
   python -m patchbay panel --recorded                        replay the committed recorded session (no QNX needed)
   python -m patchbay panel --control C --events E --samples D  live, next to a running back end
 
-Served on 127.0.0.1 only. The page polls /api/events; live, the fault buttons POST to /api/fault, which sends the
-same control request as `python -m patchbay ctl fault` and the fault matrix. A recorded session cannot be changed:
+Served on 127.0.0.1. --host can name another address, but only for a recorded session, whose fault buttons are
+disabled. The page polls /api/events; live, the fault buttons POST to /api/fault, which sends the same control
+request as `python -m patchbay ctl fault` and the fault matrix. A recorded session cannot be changed:
 its fault buttons are disabled and the faults it shows are the ones injected while it was recorded.
 """
 
@@ -13,6 +14,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import sys
 import threading
 from collections.abc import Callable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -27,6 +29,8 @@ from .faults import KINDS
 STATIC = Path(__file__).with_name("panel_static")
 RECORDINGS = Path(__file__).with_name("recordings")
 DEFAULT_FIXTURE = RECORDINGS / "session.jsonl.gz"
+LOOPBACK = "127.0.0.1"
+LOOPBACK_NAMES = ("127.0.0.1", "localhost")
 MAX_BATCH = 400
 KEEP = 4000
 
@@ -268,7 +272,7 @@ class PanelApp:
         return status, "application/json", json.dumps(obj, ensure_ascii=False).encode()
 
 
-def make_server(app: PanelApp, port: int) -> ThreadingHTTPServer:
+def make_server(app: PanelApp, port: int, host: str = LOOPBACK) -> ThreadingHTTPServer:
     class Handler(BaseHTTPRequestHandler):
         def _reply(self, method: str) -> None:
             n = int(self.headers.get("Content-Length") or 0)
@@ -292,10 +296,17 @@ def make_server(app: PanelApp, port: int) -> ThreadingHTTPServer:
         def log_message(self, format: str, *args: Any) -> None:  # noqa: A002
             return
 
-    return ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    return ThreadingHTTPServer((host, port), Handler)
 
 
 def run_panel(a: argparse.Namespace) -> int:
+    host = getattr(a, "host", LOOPBACK)
+    if host not in LOOPBACK_NAMES and not a.recorded:
+        print(
+            "patch panel: a live panel drives faults, so it listens on loopback only; use --recorded to serve a network",
+            file=sys.stderr,
+        )
+        return 2
     clock = MonotonicClock()
     if a.recorded:
         meta, events = load_fixture(Path(a.fixture) if a.fixture else DEFAULT_FIXTURE)
@@ -304,9 +315,9 @@ def run_panel(a: argparse.Namespace) -> int:
     else:
         source = LiveSource(Path(a.events), Path(a.samples) if a.samples else None, clock)
         app = PanelApp(source, a.control)
-    srv = make_server(app, a.port)
+    srv = make_server(app, a.port, host)
     mode = "recorded session" if a.recorded else "live"
-    print(f"patch panel ({mode}) on http://127.0.0.1:{srv.server_address[1]}/", flush=True)
+    print(f"patch panel ({mode}) on http://{host}:{srv.server_address[1]}/", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
