@@ -18,7 +18,7 @@ fi
     >"$OUT/guest_devices.txt" 2>&1
 for s in imu-bno055 temp-humidity-sht3x mcp-3008-joystick; do
     d="/tmp/ev-$s-$(date +%s)"
-    "$HERE/run_guest.sh" ssh "mkdir -p $d && cd $d && ($s > out.txt 2>&1 &); sleep $SECS; slay -f $s; cat out.txt" |
+    "$HERE/run_guest.sh" ssh "mkdir -p $d && cd $d && ($s > out.txt 2>&1 &); sleep $SECS; slay -f $s; sleep 3; cat out.txt" |
         tr '\r' '\n' >"$OUT/sample_$s.txt" 2>&1
     echo "$s: $(wc -l <"$OUT/sample_$s.txt") lines"
 done

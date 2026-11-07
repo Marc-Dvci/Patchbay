@@ -1,0 +1,40 @@
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+i2c  0x44 W2 ok
+i2c  0x44 R6 ok
+spi  cs0 tx 018000 rx3 ok 00034b
+spi  cs0 tx 019000 rx3 ok 00038e
+spi  cs0 tx 018000 rx3 ok 0000f5
+spi  cs0 tx 019000 rx3 ok 000213
+spi  cs0 tx 018000 rx3 ok 0000f0
+spi  cs0 tx 019000 rx3 ok 00006d
+spi  cs0 tx 018000 rx3 ok 000346
+spi  cs0 tx 019000 rx3 ok 000246

@@ -308,7 +308,17 @@ def build_rows() -> list[Row]:
 def backend_gone_check() -> tuple[bool, str]:
     a, b = probe(I2C_PROBE, 2), probe(SPI_PROBE, 2)
     ok = all(x.rc == "EIO" for x in a) and all(x.rc in ("EIO", "ETIMEDOUT") for x in b)
-    return ok, "; ".join(f"{x.op} {x.rc}" for x in a + b)
+    qemu = subprocess.run(
+        [
+            "bash",
+            "-c",
+            f"kill -0 $(cat {Path.home()}/Patchbay-work/run/qemu.pid) 2>/dev/null && echo alive || echo gone",
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    raw = " | ".join(x.raw[:80] for x in a + b if x.rc == "no-answer")
+    return ok, "; ".join(f"{x.op} {x.rc}" for x in a + b) + f"; QEMU process {qemu}" + (f"; raw: {raw}" if raw else "")
 
 
 def main() -> int:

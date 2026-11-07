@@ -512,8 +512,11 @@ int pb_vpci_run(struct pb_vpci *v, const uint16_t *heads, unsigned n, uint32_t *
         }
         uint64_t left = deadline - t;
         if (v->iid >= 0) {
-            struct timespec abs = { .tv_sec = (time_t)(deadline / 1000000000ull),
-                                    .tv_nsec = (long)(deadline % 1000000000ull) };
+            /* Wake on the interrupt, or after 10 ms at most: on the shared INTx line an interrupt can go missing
+             * (seen with spi-virtio, see docs/RESULTS.md), and then the used ring is read again anyway. */
+            uint64_t wake = t + 10000000ull < deadline ? t + 10000000ull : deadline;
+            struct timespec abs = { .tv_sec = (time_t)(wake / 1000000000ull),
+                                    .tv_nsec = (long)(wake % 1000000000ull) };
             pthread_mutex_lock(&v->lock);
             while (v->irq_count == seen) {
                 if (pthread_cond_timedwait(&v->cond, &v->lock, &abs) == ETIMEDOUT) {
