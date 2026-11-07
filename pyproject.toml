@@ -43,4 +43,4 @@ show_missing = true
 
 [tool.codespell]
 skip = "*.png,*.jpg,*.gif,*.svg,*.lock,package-lock.json,.git,.venv,node_modules,driver/build"
-ignore-words-list = "ser,te,nd"
+ignore-words-list = "ser,te,nd,nin,anc,busses,dout"

@@ -1,110 +1,169 @@
 # Patchbay
 
-**Virtio I2C and SPI drivers for QNX, so QNX's sensor samples run without a board**
-
 [![Tests](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml/badge.svg)](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml)
-[![Decision core coverage](https://img.shields.io/badge/decision%20core%20coverage-{{COVERAGE}}%25-brightgreen)](tests/)
-[![CodeQL](https://github.com/Marc-Dvci/Patchbay/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/Patchbay/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Live demo](https://img.shields.io/badge/live-demo-0a7d6e)]({{LIVE_URL}})
+[![QNX SDP 8.0](https://img.shields.io/badge/QNX%20SDP-8.0-0a7d6e)](#build-and-run)
 
-[![Watch the film: Patchbay](docs/film_thumbnail.jpg)](https://www.youtube.com/watch?v={{VIDEO_ID}})
+**Virtio I2C and SPI master drivers for QNX 8.0, built on the QNX Driver Development Kit, with a back end that
+simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM, with no board.**
 
-**[Watch the film](https://www.youtube.com/watch?v={{VIDEO_ID}})**
+| | |
+|---|---|
+| Track | Low-level Software (device drivers with the QNX DDK) |
+| Built with | QNX SDP 8.0 (`qcc`, `libi2c-master.a`, `libio-spi.a`, `libpci`), QEMU 11.1.3 vhost-user, Python 3.12 |
+| Target | QNX 8.0 x86_64 guest in QEMU (also builds for aarch64le) |
+| Headline | 3 unmodified QNX samples run on simulated BNO055, SHT3x and MCP3008; 15 of 16 fault rows as expected ([results](docs/RESULTS.md)) |
 
-<!-- TEMPLATE: one human line from Marc, confirmed facts only. -->
-
-| Live demo | Track | Built with | Headline result |
-|---|---|---|---|
-| [Open it]({{LIVE_URL}}) | {{TRACK}} | {{SPONSOR}} | {{HEADLINE}} |
-
-[For judges](#for-judges) · [See it work](#see-it-work) · [How it works](#how-it-works) · [Results](#results) ·
-[Run it](#run-it)
+[For judges](#for-judges) · [Run it](#build-and-run) · [How it works](#how-it-works) · [Evidence](#evidence) ·
+[Limitations](#what-it-does-not-do)
 
 ## For judges
 
-<!-- TEMPLATE: one row per judging criterion, in the rules' order. Link code to exact lines at the release tag
-(blob/v1.0.0/<path>#L10-L40), and open every link once the tag exists. -->
-
-| Criterion | Where it is answered |
+| Criterion | Where to look |
 |---|---|
-| {{CRITERION}} | [How it works](#how-it-works), [`app/core.py`](app/core.py) |
-
-## See it work
-
-<!-- TEMPLATE: one GIF or screenshot per key moment, from the real product (scripts/make_gif.py). -->
+| Technological implementation | DDK drivers: [`driver/qnx/i2c-virtio.c`](driver/qnx/i2c-virtio.c) (`i2c_master_getfuncs`), [`driver/qnx/spi-virtio.c`](driver/qnx/spi-virtio.c) (`spi_init`, `spi_funcs_t`); virtio PCI transport [`driver/qnx/pb_vpci.c`](driver/qnx/pb_vpci.c); split ring [`driver/core/pb_vring.c`](driver/core/pb_vring.c); vhost-user back end [`patchbay/server.py`](patchbay/server.py) |
+| Design | one script from nothing to a running sample: [`scripts/demo.sh`](scripts/demo.sh); fault injection from the command line: `scripts/run_guest.sh ctl fault ...` |
+| Potential impact | [The problem](#the-problem) |
+| Innovation | real chip models from data sheets ([`patchbay/chips/`](patchbay/chips)); a fault matrix against QNX's own sample API ([`scripts/fault_matrix.py`](scripts/fault_matrix.py)); the driver's C core tested against an independent Python device ([`tests/cross/`](tests/cross)) |
+| Evidence | [`docs/RESULTS.md`](docs/RESULTS.md), raw outputs in [`docs/results/`](docs/results) |
 
 ## The problem
 
-<!-- TEMPLATE: who it is for, the moment it matters, and the pain with one sourced number[^1]. -->
+QNX's sensor samples ([qnx/Raspberry-Pi-Hardware-Component-Samples](https://github.com/qnx/Raspberry-Pi-Hardware-Component-Samples))
+open `/dev/i2c1` and `/dev/io-spi/spi0/dev0` on a Raspberry Pi. A student without a Pi, or without the sensor
+breakout, cannot run them. QNX reports 24,000 students in its academic programme; most do not own the board.
+
+The same gap exists in production. On a hypervisor, a guest reaches its peripherals through virtio: the guest runs a
+virtio driver and the device lives in another VM or process. The virtio specification defines an I2C adapter (device
+34) and an SPI controller (device 45). QNX's own guest driver package, `com.qnx.qnx800.target.driver.virtio`, ships
+block and console drivers only (checked in the software center's package metadata, see
+[RESULTS](docs/RESULTS.md#kill-tests)). No public QNX port of a virtio I2C or SPI driver was found.
+
+Patchbay fills both: the drivers are ordinary DDK drivers a QNX guest can use on any hypervisor that offers these
+devices, and the back end gives a student the chips.
 
 ## How it works
 
-![Patchbay, step by step: the input, the model step that reads it, the decision by fixed rules, and the output with
-its evidence](docs/architecture.png)
-
-Models read and phrase; plain code decides ([`app/core.py`](app/core.py)). The diagram's source is
-[`docs/architecture.mmd`](docs/architecture.mmd).
-
-## How {{SPONSOR}} is used
-
-| Product | What it does here | Why it is needed |
-|---|---|---|
-
-## What it will not do
-
-<!-- TEMPLATE: briefly: safety, approvals, refusals. -->
-
-## Results
-
-<!-- TEMPLATE: counts, before and after, and the command that reproduces each one. Then one line on what is real and
-what is synthetic. -->
-
-## Run it
-
-> [!TIP]
-> Nothing to install: the [live demo]({{LIVE_URL}}), or a ready environment in your browser:
-> [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Marc-Dvci/Patchbay?quickstart=1)
-
-### With Docker
-
-| | Command | Opens at | Needs |
-|---|---|---|---|
-| **Demo** | `docker compose up demo` | http://localhost:8080 | Nothing |
-| **Live** | `docker compose up app` | http://localhost:8787 | `cp .env.example .env`, then your keys |
-
-### From source
-
-Python 3.12.
-
-```sh
-python -m venv .venv
-. .venv/Scripts/activate           # Linux, macOS: . .venv/bin/activate; PowerShell: .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-APP_DEMO=1 python -m uvicorn app.server:app --port 8787    # http://localhost:8787, no keys
+```
+ QNX 8.0 guest (QEMU)                                   Linux host (or WSL2)
+ imu-bno055  temp-humidity-sht3x  mcp-3008-joystick     python -m patchbay serve
+   (upstream, unmodified)                                 vhost-user socket per device
+   devctl(DCMD_I2C_*)   devctl(DCMD_SPI_*)                VirtioI2c ── I2cBus: BNO055 @0x28, SHT3x @0x44
+ /dev/i2c1            /dev/io-spi/spi0/dev0               VirtioSpi ── SpiBus: MCP3008 on cs0
+ libi2c-master.a      libio-spi.a       (QNX DDK)         FaultPlan <── control socket (JSON)
+ i2c-virtio           spi-virtio        (Patchbay)
+   pb_i2c / pb_spi framing, pb_vring split ring  (portable C, tested on the host)
+   pb_vpci: libpci, virtio capabilities, INTx, deadlines
+        │ PCI 1af4:1062, 1af4:106d
+ QEMU vhost-user-i2c-pci, vhost-user-spi-pci ─────────── shared guest RAM (memfd), kick/call eventfds
 ```
 
-Tests: `pip install -r requirements-dev.txt`, then `python -m pytest --cov`. {{TEST_COUNT}} tests run in a new random
-order each time, each within 30 seconds; they cover {{COVERAGE}}% of the decision core's lines and
-{{BRANCH_COVERAGE}}% of its branches, and CI fails below 90%. The CI run page splits them into unit, integration and
-end-to-end tests.
+QEMU keeps the PCI device model; the request queues are served by the back end, which reads and writes the guest's
+memory directly. Each transfer has a deadline (1000 ms by default): a device that stops answering is reset, the
+transfer fails with EIO (I2C) or ETIMEDOUT (SPI), and the next transfer starts on an empty queue.
 
-## Claims
+## How QNX is used
 
-| Claim | Code | Test |
+| QNX part | Use |
+|---|---|
+| I2C DDK, `libi2c-master.a` | provides `main()`, the resource manager at `/dev/i2c<unit>` and the `DCMD_I2C_*` devctls; Patchbay supplies the hardware functions through `i2c_master_getfuncs()` |
+| SPI DDK, `libio-spi.a` | parses `spi.conf`, runs a bus thread and a node per device; Patchbay supplies `spi_init()` and `spi_funcs_t` |
+| PCI server, `libpci` | `pci_device_find`, `pci_device_attach`, capability walk in configuration space, `pci_device_map_as`, `pci_device_read_irq` |
+| Kernel | `InterruptAttachEvent()` with a pulse, `InterruptUnmask()` on a dedicated thread (the INTx line is shared), `ThreadCtl(_NTO_TCTL_IO_LEVEL)`, `mmap(MAP_PHYS)` and `mem_offset64()` for DMA memory |
+| `mkqnximage` | builds the guest image with the drivers, `spi.conf`, the samples and `pbprobe` ([`image/`](image)) |
+
+### Evidence of QNX use
+
+- `driver/qnx/i2c-virtio.c`: `i2c_master_getfuncs()`, `i2cv_send()`, `i2cv_recv()`, `i2cv_xfer()`
+- `driver/qnx/spi-virtio.c`: `spi_init()`, `spiv_xfer()`, `spiv_setcfg()`, `spi_create_devs()` call
+- `driver/qnx/pb_vpci.c`: `pb_vpci_open()`, `find_caps()`, `bring_up()`, `pb_vpci_run()`, `irq_loop()`
+- `driver/Makefile`: links `-l:libi2c-master.a` and `-l:libio-spi.a` with `qcc -Vgcc_ntox86_64`
+- Output from the guest: [`docs/results/guest_devices.txt`](docs/results/guest_devices.txt),
+  [`docs/results/sample_imu-bno055.txt`](docs/results/sample_imu-bno055.txt),
+  [`docs/results/fault_matrix.md`](docs/results/fault_matrix.md)
+
+## What it does not do
+
+- No timing claims. The guest runs under software emulation (QEMU, TCG); results are functional only.
+- virtio-i2c reports one error status, so the driver cannot tell an address NAK from a data NAK; both are EIO.
+- 7-bit I2C addresses only; 8-bit SPI words (the back end offers 8; the driver passes 16 or 32 to a controller that offers them); no SPI DMA hooks: transfers already use the virtqueue's DMA memory.
+- The simulated chips follow their data sheets for what the samples use; what each model leaves out is listed at the top of its source file.
+- When the back end process stops, QEMU 11.1.3 stops too, so a back end that disappears and returns is not covered ([RESULTS](docs/RESULTS.md#fault-matrix)).
+
+> [!IMPORTANT]
+> Real: the QNX drivers, the QNX sample binaries, the virtio devices in QEMU. Simulated: the chips behind the buses,
+> and the faults.
+
+## Evidence
+
+All figures and their commands are in [`docs/RESULTS.md`](docs/RESULTS.md). In short (QEMU, TCG):
+
+| Claim | Command | Test or file |
 |---|---|---|
-| A fact is settled only when two independent sources agree | [`app/core.py`](app/core.py) | [`tests/test_core.py`](tests/test_core.py) |
+| The three samples run unmodified | `scripts/evidence.sh` | `docs/results/sample_*.txt` |
+| 15 of 16 fault rows behave as expected, drivers keep running | `python3 scripts/fault_matrix.py` | `docs/results/fault_matrix.md` |
+| The C ring and framing agree with an independent Python device | `scripts/host_tests.sh` | `tests/cross/` |
+| Each of 9 deliberate bugs in the C core is caught | `scripts/mutation_check.sh` | `scripts/mutation_check.sh` |
+| Chip models match their data sheets' examples (CRC-8 0xBEEF → 0x92, BNO055 IDs, MCP3008 bit order) | `scripts/host_tests.sh` | `tests/unit/test_sht3x.py`, `test_bno055.py`, `test_mcp3008.py` |
+
+Tests: 17 C unit tests (106 checks, under ASan and UBSan) · 95 Python unit · 13 cross · 10 integration.
+Back end coverage, lines and branches: 85 %.
+
+## Build and run
+
+**QNX version:** QNX SDP 8.0 (free QNX Everywhere licence). **Target:** QNX 8.0 x86_64 guest in QEMU 11.1.3.
+**Toolchain:** `qcc -Vgcc_ntox86_64` (GCC 12.2) from the SDP. **Host:** Linux x86_64 or WSL2 (Ubuntu 22.04 tested),
+Python 3.12. vhost-user needs QEMU on Linux, so QEMU for Windows cannot run it.
+
+> [!TIP]
+> One command, from a machine with QNX SDP 8.0 in `~/qnx800`:
+> `scripts/demo.sh` builds QEMU 11.1.3 the first time, then the drivers, the samples and the image, boots the guest
+> and prints the three samples' output.
+
+Step by step:
+
+```bash
+sudo apt install build-essential ninja-build pkg-config libglib2.0-dev libpixman-1-dev libslirp-dev \
+     python3-venv flex bison curl xz-utils
+scripts/build_qemu.sh            # QEMU 11.1.3 with vhost-user-spi-pci, into ~/Patchbay-work/qemu
+scripts/build_drivers.sh         # i2c-virtio, spi-virtio, pbprobe; the upstream samples at a pinned commit
+image/build.sh                   # QNX image with mkqnximage
+scripts/run_guest.sh start       # back end + guest; ssh on 127.0.0.1:2252
+scripts/run_guest.sh ssh imu-bno055
+scripts/run_guest.sh ctl fault nak --bus i2c --target 0x28 --count 3     # while a sample runs
+scripts/run_guest.sh stop
+```
+
+Host tests only (no QNX SDP needed):
+
+```bash
+python3.12 -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
+scripts/host_tests.sh
+```
 
 ## Layout
 
-- `app/` the decision core (`core.py`) and the HTTP API (`server.py`)
-- `web/` the web page, served by the API on the same port
-- `tests/` the rules and the HTTP entry points
-- `docs/` the architecture diagram and its source
-- `scripts/` checks (links, placeholders) and figure tools (diagram, GIFs)
+| Path | What |
+|---|---|
+| `driver/core/` | portable C: split virtqueue, virtio-i2c and virtio-spi framing |
+| `driver/qnx/` | the two DDK drivers and the virtio PCI transport |
+| `driver/tools/pbprobe.c` | one-line-per-transfer probe used by the fault matrix |
+| `driver/tests/` | C unit tests of the core |
+| `patchbay/` | the back end: vhost-user, virtio devices, buses, faults, chip models |
+| `image/` | mkqnximage snippets, `spi.conf`, start script |
+| `scripts/` | build, boot, demo, evidence, fault matrix, mutation check |
+| `tests/` | Python unit, cross and integration tests |
 
-## License
+`app/`, `web/`, `Dockerfile`, `compose.yaml` and `tests/test_core.py`, `tests/test_server.py` are left from the project
+template and are not part of Patchbay; nothing runs or tests them.
 
-[MIT](LICENSE).
+## Built on
 
-[^1]: {{SOURCE}}
+- QNX SDP 8.0 DDK libraries and headers (QNX Everywhere licence), not redistributed here.
+- QEMU 11.1.3's `vhost-user-i2c-pci` and `vhost-user-spi-pci` (GPL-2.0-or-later), built from the official tarball, not included.
+- QNX's sample programs, [qnx/Raspberry-Pi-Hardware-Component-Samples](https://github.com/qnx/Raspberry-Pi-Hardware-Component-Samples) (Apache-2.0), fetched and built at commit `fb1f9df`, not copied.
+- Structure layouts from the virtio specification and Linux's `include/uapi/linux/virtio_i2c.h` and `virtio_spi.h`, restated, not copied.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE).
