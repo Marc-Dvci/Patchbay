@@ -119,7 +119,10 @@ def test_live_events_and_sample_lines_are_merged_as_the_files_grow(tmp_path: Pat
 @pytest.mark.parametrize(
     "body,expected",
     [
-        ({"kind": "unplug", "bus": "i2c", "target": 0x28}, {"cmd": "fault", "kind": "unplug", "bus": "i2c", "target": 40}),
+        (
+            {"kind": "unplug", "bus": "i2c", "target": 0x28},
+            {"cmd": "fault", "kind": "unplug", "bus": "i2c", "target": 40},
+        ),
         (
             {"kind": "delay", "bus": "spi", "delay_ms": 1500, "count": 2},
             {"cmd": "fault", "kind": "delay", "bus": "spi", "count": 2, "delay_ms": 1500},
@@ -168,7 +171,9 @@ def test_the_committed_recording_replays_bus_traffic_faults_and_all_three_sample
     kinds = {e["type"] for e in events}
     assert {"i2c", "spi", "fault", "sample", "note"} <= kinds
     assert {e["name"] for e in events if e["type"] == "sample"} == {
-        "imu-bno055", "temp-humidity-sht3x", "mcp-3008-joystick"
+        "imu-bno055",
+        "temp-humidity-sht3x",
+        "mcp-3008-joystick",
     }
     assert any("CHIP_ID = 0xA0" in str(e.get("what")) for e in events)
     assert any(e["type"] == "fault" and e.get("fault", {}).get("kind") == "unplug" for e in events)

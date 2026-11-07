@@ -245,6 +245,8 @@ def test_the_server_takes_fault_commands_on_its_control_socket() -> None:
         status = ask({"cmd": "status"})
         assert status["devices"] == {"i2c": {"connected": False, "completed": 0, "failed": 0}}
         assert ask({"cmd": "clear"})["cleared"] == 1
+        assert ask({"cmd": "freeze"})["ok"] is False  # this server was given no freezable clock
+        assert ask({"cmd": "dance"})["ok"] is False
         assert ask({"cmd": "stop"})["ok"]
         t.join(timeout=5)
         assert not t.is_alive()

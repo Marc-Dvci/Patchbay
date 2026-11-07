@@ -168,3 +168,19 @@ def test_spi_chip_selects_are_checked_when_attaching() -> None:
     bus.attach(0, Fixed(b""))
     with pytest.raises(ValueError):
         bus.attach(0, Fixed(b""))
+
+
+def test_a_frozen_clock_holds_still_and_resumes_without_a_jump(monkeypatch: pytest.MonkeyPatch) -> None:
+    import patchbay.clock as clock_mod
+
+    now = [100.0]
+    monkeypatch.setattr(clock_mod.time, "monotonic", lambda: now[0])
+    c = clock_mod.FreezableClock()
+    assert c.now() == 100.0
+    c.freeze()
+    now[0] = 130.0
+    assert c.now() == 100.0
+    c.thaw()
+    assert c.now() == 100.0
+    now[0] = 131.0
+    assert c.now() == 101.0

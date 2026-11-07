@@ -54,3 +54,25 @@ def test_the_mcp3008_frame_decodes_channel_and_code() -> None:
     )
     assert describe_spi(0, bytes.fromhex("019000"), bytes.fromhex("0003ff"), True).startswith("MCP3008 cs0 CH1")
     assert describe_spi(0, b"\x00", b"", False) == "MCP3008 cs0: transfer refused"
+
+
+def test_vectors_and_the_quaternion_are_scaled_as_the_data_sheet_says() -> None:
+    acc = describe_i2c([(0x28, False, b"\x08", True), (0x28, True, struct.pack("<3h", 100, -981, 0), True)])
+    assert acc.endswith("ACC_DATA accel 1.00, -9.81, 0.00 m/s²")
+    q = describe_i2c([(0x28, False, b"\x20", True), (0x28, True, struct.pack("<4h", 16384, 0, 0, -8192), True)])
+    assert q.endswith("QUA_DATA w 1.000, x 0.000, y 0.000, z -0.500")
+    mode = describe_i2c([(0x28, False, b"\x3d", True), (0x28, True, b"\x08", True)])
+    assert mode.endswith("OPR_MODE = IMU")
+
+
+def test_writes_name_reset_calibration_and_plain_registers() -> None:
+    assert describe_i2c([(0x28, False, b"\x3f\x20", True)]).endswith("SYS_TRIGGER ← reset (650 ms start-up)")
+    assert describe_i2c([(0x28, False, b"\x55" + bytes(22), True)]).endswith("write calibration block, 22 bytes")
+    assert describe_i2c([(0x28, False, b"\x3b\x01", True)]).endswith("UNIT_SEL ← 0x01")
+    assert describe_i2c([(0x28, False, b"\x07", True)]).endswith("select PAGE_ID")
+
+
+def test_an_sht3x_status_read_and_an_unknown_command() -> None:
+    status = word_with_crc(0x8010)
+    assert describe_i2c([(0x44, True, status, True)]).endswith("status 0x8010, CRC ok")
+    assert describe_i2c([(0x44, False, b"\x12\x34", True)]).endswith("command 0x1234")

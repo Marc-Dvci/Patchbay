@@ -21,13 +21,13 @@ device ID 34) and `1af4:106d` (virtio SPI, device ID 45); `/dev/i2c1`, `/dev/io-
 
 Built from [qnx/Raspberry-Pi-Hardware-Component-Samples](https://github.com/qnx/Raspberry-Pi-Hardware-Component-Samples)
 at `fb1f9df` by `scripts/build_samples.sh`, which refuses a modified tree. Output recorded by `scripts/evidence.sh 8`
-(8 seconds each, QEMU, TCG):
+(8 seconds each, QEMU, TCG, run of 7 Nov 2026 03:44):
 
 | Sample | Device | Output | First lines |
 |---|---|---|---|
-| `imu-bno055` | `/dev/i2c1`, BNO055 at 0x28 | [476 lines](results/sample_imu-bno055.txt) | `BNO055 Chip ID: 0xA0`, calibration reaches `SYS=3, GYR=3, ACC=3, MAG=3`, then Euler, quaternion, accelerometer, gravity, gyroscope and magnetometer readings |
-| `temp-humidity-sht3x` | `/dev/i2c1`, SHT3x at 0x44 | [16 lines](results/sample_temp-humidity-sht3x.txt) | `Temp: 22.78°C, Humidity: 46.93%` |
-| `mcp-3008-joystick` | `/dev/io-spi/spi0/dev0`, MCP3008 on chip select 0 | [66 lines](results/sample_mcp-3008-joystick.txt) | `Joystick X:  686, Y:  877` |
+| `imu-bno055` | `/dev/i2c1`, BNO055 at 0x28 | [457 lines](results/sample_imu-bno055.txt) | `BNO055 Chip ID: 0xA0`, calibration reaches `SYS=3, GYR=3, ACC=3, MAG=3`, then Euler, quaternion, accelerometer, gravity, gyroscope and magnetometer readings |
+| `temp-humidity-sht3x` | `/dev/i2c1`, SHT3x at 0x44 | [16 lines](results/sample_temp-humidity-sht3x.txt) | `Temp:` about 22.6 °C, `Humidity:` about 45.5 % |
+| `mcp-3008-joystick` | `/dev/io-spi/spi0/dev0`, MCP3008 on chip select 0 | [78 lines](results/sample_mcp-3008-joystick.txt) | `Joystick X:` and `Y:` codes from 0 to 1023 |
 
 The back end's view of the same bus: [`results/backend_trace_tail.txt`](results/backend_trace_tail.txt), for example
 `spi  cs0 tx 018000 rx3 ok 000262` (the sample's start bit, channel 0, and the 10-bit answer).
@@ -78,13 +78,52 @@ QEMU prints `Failed to set msg fds.` then
 The same QEMU with `reconnect-ms=500` on a client-mode chardev fails earlier, at start-up:
 `vhost_backend_init failed: Protocol error`, before the back end receives any message.
 
-## A bug the fault matrix found
+## A lost interrupt, found by the fault matrix: root cause and fix
 
-The first run of the matrix showed SPI transfers after a fault returning EOK but only at their 1000 ms deadline
-(`guest_ms=1001` in the raw log): a completion interrupt on the INTx line both controllers share was missed, and the
-transfer was only reaped when the wait ended. `pb_vpci_run()` now re-reads the used ring at least every 10 ms while
-it waits. The second run shows the same calls returning at 10 to 12 ms. Both raw logs are in `results/`. These are
-guest-clock figures under TCG: they show the change, not real-time behaviour.
+The first run of the matrix showed SPI transfers returning EOK but only at their 1000 ms deadline (`guest_ms=1001` in
+[`results/fault_matrix-20261107-030510.log`](results/)). An interim fix re-read the used ring every 10 ms; it hid the
+problem, so it was replaced by the cause:
+
+- With `PB_TRACE=1`, both drivers printed what the PCI server and the device's configuration space say about the
+  interrupt. `i2c-virtio` (slot 2): `PCI server irq 10; config space interrupt line 10, pin 1`. `spi-virtio` (slot 3):
+  `PCI server irq 10; config space interrupt line 11, pin 1`.
+- With the re-check off (`PB_RECHECK_MS=0`), `pbprobe spi-xchg 0 0 018000 3` took 1002, 1000 and 1001 ms. Run while
+  `pbprobe` loaded the I2C bus at the same time, the same transfers took 5, 3 and 3 ms: the SPI driver was only woken
+  by the I2C controller's interrupts on IRQ 10. Its own interrupt went to IRQ 11, where nothing was attached.
+- So the PCI server reported IRQ 10 for a device the firmware had routed to IRQ 11. `pb_vpci.c` (`start_irq()`) now
+  attaches to the Interrupt Line register's value when it differs from the PCI server's on x86, and says so on the
+  console. The periodic re-check is off by default; a transfer still re-reads the used ring at its deadline, so a lost
+  interrupt costs one deadline, never a hang.
+- After the fix, with no re-check: `pbprobe spi-xchg` took 2, 0 and 0 ms with the I2C bus idle
+  ([`results/irq_check.txt`](results/irq_check.txt)), and every transfer after a cleared fault in the matrix returned
+  in 1 to 4 ms. Guest-clock figures under TCG: they show which wake-up happened, not real-time behaviour.
+
+## The patch panel's recorded session
+
+[`patchbay/recordings/session.jsonl.gz`](../patchbay/recordings/session.jsonl.gz) was recorded on 7 Nov 2026 at
+03:48 by `scripts/record_session.py`, against a guest started by `scripts/run_guest.sh start` (QNX 8.0 x86_64 in QEMU
+11.1.3, TCG). 50 seconds: QNX's three samples running unmodified, while the script pulled the BNO055's cord, made the
+SHT3x refuse three transfers, corrupted SHT3x and MCP3008 readings, held the I2C bus stuck for 4 seconds and delayed
+two SPI answers by 1500 ms. It holds 3,049 I2C and 938 SPI transactions, 4,205 lines of sample output, 9 faults or
+clears and 9 captions. `python -m patchbay panel --recorded` replays it; `tests/unit/test_panel.py` checks its
+contents.
+
+The first recording, a few minutes earlier, showed the SHT3x and joystick output arriving in a few large blocks: run
+over ssh without a terminal, the samples' `printf` output is block-buffered. The samples now run on a guest terminal
+(`ssh -tt`, `scripts/run_guest.sh ssh-tty`), so each line arrives as it is printed.
+
+Seen in the recording: when its reads fail, `imu-bno055` prints `error with devctl: Input/output error` and then
+values from buffers its read never filled (for example `Y=-40902509353289263805560000...`). The sample does not check
+`bno055_read_vector()`'s return value. Patchbay does not change the sample; the panel shows what it prints.
+
+## From a clean clone
+
+`git clone` of this repository into a new folder, then `scripts/demo.sh all 6` from it (7 Nov 2026, 03:20, QNX SDP
+8.0 in `~/qnx800`, QEMU 11.1.3 already built in `~/Patchbay-work/qemu`): it built the drivers, the upstream samples
+and the image, booted the guest, and printed the output of all three samples (`Temp: 22.61°C, Humidity: 45.50%`,
+`Joystick X:  705, Y:  867`, BNO055 readings) and the back end's trace. It exited with 0. Nothing in it had to be
+fixed. The aarch64le build (`make -C driver ARCH=aarch64le`) produces `i2c-virtio`, `spi-virtio` and `pbprobe` as
+`ELF 64-bit LSB pie executable, ARM aarch64`; they have not been run on an ARM guest.
 
 ## Host tests
 
@@ -93,11 +132,12 @@ guest-clock figures under TCG: they show the change, not real-time behaviour.
 | Kind | Count | What |
 |---|---|---|
 | C unit | 17 tests, 106 checks | `driver/tests/test_core.c`: ring and framing, under AddressSanitizer and UBSan |
-| Python unit | 95 | device ring, vhost-user codec, BNO055, SHT3x, MCP3008, buses, faults, devices |
+| Python unit | 127 | device ring, vhost-user codec, BNO055, SHT3x, MCP3008, buses, faults, devices, decoder, panel API and replay |
 | Cross | 13 | the driver's C core (host build, ctypes) against the back end's Python device in shared memory |
-| Integration | 10 | the back end's vhost-user state machine over real sockets, memfd and eventfds |
+| Integration | 11 | the back end's vhost-user state machine over real sockets, memfd and eventfds; a panel fault button reaching the back end's control socket |
+| Browser (e2e) | 4 | the panel in headless Chromium: axe-core WCAG 2.2 AA at 1440 and 390 px (0 violations), recorded mode disables faults, a fault button from the keyboard |
 
-Coverage of the back end (`patchbay/`, lines and branches): 85 %. Mutation check (`scripts/mutation_check.sh`):
+Coverage of the back end (`patchbay/`, lines and branches): 86 %. Mutation check (`scripts/mutation_check.sh`):
 9 deliberate bugs in the C core, 9 caught, with a control run of the unmodified core first.
 
 One bug found by these tests is pinned by a regression test: the Python device read a `bits_per_word_mask` of 0 as
@@ -109,5 +149,6 @@ One bug found by these tests is pinned by a regression test: the Python device r
   `ThreadCtl(_NTO_TCTL_IO_LEVEL, ...)` the driver faulted in `hw_io_rd` (core dump read with `ntox86_64-gdb`).
 - io-spi frees `bus->funcs` at shutdown, takes the DMA path whenever `dma_xfer` is set, and needs the driver to call
   `spi_create_devs()`; io-spi also reads `base=0` and `irq=0` in `spi.conf` as missing.
+- The PCI server reported IRQ 10 for the SPI controller in slot 3, whose Interrupt Line register said 11 (see the lost interrupt above).
 - QEMU's `vhost-user-i2c-pci` and `vhost-user-spi-pci` give a 4-entry queue, so each request uses exactly two
   descriptors and a write-then-read transaction fits.
