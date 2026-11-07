@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patchbay: patch panel</title>
+<meta name="description" content="QNX's sensor samples on virtio I2C and SPI, with simulated chips you can unplug.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<header class="plate">
+  <h1 class="wordmark">PATCHBAY</h1>
+  <p class="tagline">virtio I2C and SPI for QNX 8.0, with chips you can unplug</p>
+  <p id="mode" class="mode" role="status"></p>
+</header>
+
+<main>
+  <section aria-labelledby="rack-title" class="rack-wrap">
+    <h2 id="rack-title" class="visually-hidden">The patch panel</h2>
+    <svg id="rack" viewBox="0 0 1200 430" role="img" aria-labelledby="rack-desc">
+      <desc id="rack-desc">Two buses on the top row, three chips on the bottom row, patched with cords.</desc>
+      <defs>
+        <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3a4048"/><stop offset="0.5" stop-color="#2a2f36"/><stop offset="1" stop-color="#1f2329"/>
+        </linearGradient>
+        <radialGradient id="brass" cx="0.4" cy="0.35" r="0.7">
+          <stop offset="0" stop-color="#f3d58a"/><stop offset="0.6" stop-color="#c49a3a"/><stop offset="1" stop-color="#7a5a1c"/>
+        </radialGradient>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000" flood-opacity="0.55"/>
+        </filter>
+      </defs>
+      <rect x="10" y="10" width="1180" height="410" rx="6" fill="url(#alu)" stroke="#111" stroke-width="2"/>
+      <g class="ears" fill="#15181c">
+        <circle cx="34" cy="40" r="7"/><circle cx="34" cy="390" r="7"/>
+        <circle cx="1166" cy="40" r="7"/><circle cx="1166" cy="390" r="7"/>
+      </g>
+      <text x="70" y="52" class="engrave">BUSES</text>
+      <text x="70" y="262" class="engrave">CHIPS</text>
+      <line x1="70" y1="215" x2="1130" y2="215" class="rule"/>
+      <g id="jacks"></g>
+      <g id="cords" filter="url(#shadow)"></g>
+    </svg>
+  </section>
+
+  <section aria-labelledby="ctl-title" class="controls">
+    <h2 id="ctl-title">Faults</h2>
+    <p id="ctl-note" class="note"></p>
+    <div id="ctl" class="ctl-grid"></div>
+  </section>
+
+  <p id="caption" class="caption" aria-live="polite"></p>
+
+  <div class="columns">
+    <section aria-labelledby="wire-title">
+      <h2 id="wire-title">On the wire <span class="sub">as the back end saw each transfer</span></h2>
+      <div id="wires"></div>
+    </section>
+    <section aria-labelledby="guest-title">
+      <h2 id="guest-title">In the guest <span class="sub">QNX's samples, unmodified, as they print</span></h2>
+      <div id="tapes"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <p>Served on 127.0.0.1 only. Real: the QNX drivers <code>i2c-virtio</code> and <code>spi-virtio</code>, QNX's
+  sample binaries, QEMU's virtio devices. Simulated: the chips and the faults.</p>
+</footer>
+<script src="panel.js"></script>
+</body>
+</html>
