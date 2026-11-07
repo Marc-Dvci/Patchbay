@@ -57,8 +57,17 @@ class SpiConfig:
 
     def pack(self) -> bytes:
         return CONFIG.pack(
-            self.cs_max_number, self.cs_change_supported, 0, 0, self.bits_per_word_mask, self.mode_func_supported,
-            self.max_freq_hz, 0, 0, 0, 0,
+            self.cs_max_number,
+            self.cs_change_supported,
+            0,
+            0,
+            self.bits_per_word_mask,
+            self.mode_func_supported,
+            self.max_freq_hz,
+            0,
+            0,
+            0,
+            0,
         )
 
     def mode_ok(self, mode: int) -> bool:
@@ -142,8 +151,10 @@ class VirtioSpi:
         c = self.spi_config
         if not req.well_formed or req.cs >= c.cs_max_number:
             return PARAM_ERR
-        if req.bits_per_word == 0 or not c.bits_per_word_mask & (1 << (req.bits_per_word - 1)):
+        if req.bits_per_word == 0 or req.bits_per_word > 32:
             return PARAM_ERR
+        if c.bits_per_word_mask and not c.bits_per_word_mask & (1 << (req.bits_per_word - 1)):
+            return PARAM_ERR  # a mask of 0 means no limitation (virtio_spi.h, bits_per_word_mask)
         if c.max_freq_hz and req.freq > c.max_freq_hz:
             return PARAM_ERR
         if not c.mode_ok(req.mode):
