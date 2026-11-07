@@ -174,20 +174,24 @@ class VirtioSpi:
             if req is None:
                 done.append((chain.head, 0))
                 continue
-            delay = self.faults.take("spi", "delay")
+            delay = self.faults.take("spi", "delay", req.cs)
             wait = delay.delay_ms / 1000.0 if delay else 0.0
             self.pending.append(Pending(req, self.clock.now() + wait))
         return done + self.poll()
 
     def next_deadline(self) -> float | None:
-        if not self.pending or self.faults.active("spi", "stuck"):
+        if not self.pending or self.faults.active("spi", "stuck", self.pending[0].req.cs):
             return None
         return self.pending[0].not_before
 
     def poll(self) -> list[tuple[int, int]]:
         done: list[tuple[int, int]] = []
         now = self.clock.now()
-        while self.pending and not self.faults.active("spi", "stuck") and self.pending[0].not_before <= now:
+        while (
+            self.pending
+            and not self.faults.active("spi", "stuck", self.pending[0].req.cs)
+            and self.pending[0].not_before <= now
+        ):
             done.append(self._run(self.pending.pop(0).req))
         return done
 

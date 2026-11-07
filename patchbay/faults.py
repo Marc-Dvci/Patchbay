@@ -7,12 +7,15 @@
   delay    the controller completes each request `delay_ms` late
   error    the controller reports a transfer error (VIRTIO_I2C_MSG_ERR, VIRTIO_SPI_TRANS_ERR) without touching the bus
 
-`target` narrows a fault to one I2C address or one SPI chip select; None means every target on that bus.
+`target` narrows a fault to one I2C address or one SPI chip select; None means every target on that bus. A fault that
+lives in the controller (stuck, delay, error) hits a request when the request touches the target: an I2C group that
+reaches several addresses is hit if any of them is the target.
 """
 
 from __future__ import annotations
 
 import random
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -49,7 +52,9 @@ class Fault:
         self.rng = random.Random(self.seed)
 
     def matches(self, bus: str, target: int | None) -> bool:
-        return self.bus == bus and (self.target is None or target is None or self.target == target)
+        """A fault without a target hits every target on its bus. One with a target hits only that target, so a
+        request that names no target is not hit by it."""
+        return self.bus == bus and (self.target is None or self.target == target)
 
     def describe(self) -> dict[str, object]:
         return {
@@ -82,7 +87,20 @@ class FaultPlan:
 
     def take(self, bus: str, kind: str, target: int | None = None) -> Fault | None:
         """The first matching fault, with one use counted against it."""
-        f = self.active(bus, kind, target)
+        return self._use(self.active(bus, kind, target))
+
+    def active_any(self, bus: str, kind: str, targets: Iterable[int]) -> Fault | None:
+        """The first fault of this kind that hits at least one of the targets a request touches."""
+        wanted = list(targets)
+        for f in self.faults:
+            if f.kind == kind and any(f.matches(bus, t) for t in wanted):
+                return f
+        return None
+
+    def take_any(self, bus: str, kind: str, targets: Iterable[int]) -> Fault | None:
+        return self._use(self.active_any(bus, kind, targets))
+
+    def _use(self, f: Fault | None) -> Fault | None:
         if f is not None and f.count is not None:
             f.count -= 1
             if f.count == 0:
