@@ -154,17 +154,17 @@ class VirtioI2c:
             self.failed += 1
         self._trace(group, [res.ok for res in results])
         if self.events is not None:
-            segs = [
+            wire: list[tuple[int, bool, bytes, bool]] = [
                 (r.addr, r.read, res.data if r.read else r.data, res.ok) for r, res in zip(group, results, strict=True)
             ]
             self.events.emit(
                 {
                     "type": "i2c",
                     "segs": [
-                        {"addr": a, "dir": "R" if rd else "W", "data": d.hex(), "ok": ok} for a, rd, d, ok in segs
+                        {"addr": a, "dir": "R" if rd else "W", "data": d.hex(), "ok": ok} for a, rd, d, ok in wire
                     ],
                     "ok": all(res.ok for res in results),
-                    "what": describe_i2c(segs),
+                    "what": describe_i2c(wire),
                 }
             )
         return [(r.chain.head, answer(r, res.ok, res.data)) for r, res in zip(group, results, strict=True)]
