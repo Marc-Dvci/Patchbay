@@ -120,7 +120,7 @@ values from buffers its read never filled (for example `Y=-409025093532892638055
 
 `git clone` of this repository into a new folder, then `scripts/demo.sh all 6` from it (7 Nov 2026, 03:20, QNX SDP
 8.0 in `~/qnx800`, QEMU 11.1.3 already built in `~/Patchbay-work/qemu`): it built the drivers, the upstream samples
-and the image, booted the guest, and printed the output of all three samples (`Temp: 22.61°C, Humidity: 45.50%`,
+and the image, booted the guest, and printed the output of all three samples (`Temp: 22.61°C, Humidity: 45.51%`,
 `Joystick X:  705, Y:  867`, BNO055 readings) and the back end's trace. It exited with 0. Nothing in it had to be
 fixed. The aarch64le build (`make -C driver ARCH=aarch64le`) produces `i2c-virtio`, `spi-virtio` and `pbprobe` as
 `ELF 64-bit LSB pie executable, ARM aarch64`; they have not been run on an ARM guest.
