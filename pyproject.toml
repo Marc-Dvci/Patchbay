@@ -28,6 +28,7 @@ xfail_strict = true
 markers = [
     "cross: the driver's C core (host build, through ctypes) against the back end's Python device",
     "integration: the back end's server over real sockets, with a scripted vhost-user front end",
+    "e2e: the patch panel in a headless browser (Playwright, axe-core)",
     "guest: needs a booted QNX guest; run by scripts/fault_matrix.sh, results in docs/RESULTS.md",
 ]
 
