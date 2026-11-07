@@ -8,7 +8,7 @@ recovered, counts), not timing.
 
 | Test | Command | Result |
 |---|---|---|
-| Does QNX already ship virtio I2C or SPI? | `qnxsoftwarecenter_clt -list`, then the `provides` lists in the software center's package metadata | `com.qnx.qnx800.target.driver.virtio` (all versions) provides only `devb_virtio`, `devc_virtio` and `startup_armv8_fm`. No package in the metadata provides an I2C or SPI virtio driver. No public QNX port of one was found. |
+| Does QNX already ship virtio I2C or SPI? | `qnxsoftwarecenter_clt -list`, then the `provides` lists in the software center's package metadata (`packages.json` in its server cache) | What the metadata lists for `com.qnx.qnx800.target.driver.virtio` (all versions): the binaries `devb_virtio`, `devc_virtio` and `startup_armv8_fm`. No package in the metadata lists an I2C or SPI virtio driver. This is the metadata's listing, not a listing of the package's files: downloading the package needs a myQNX login, which this check did not use. No public QNX port of a virtio I2C or SPI driver was found. |
 | Can a QNX guest do one I2C transaction against a simulated chip on this PC? | `scripts/run_guest.sh start`, then `imu-bno055` in the guest | Yes: `BNO055 Chip ID: 0xA0` through `i2c-virtio` and `/dev/i2c1` (QEMU, TCG). |
 
 ## The guest sees both controllers
@@ -51,12 +51,32 @@ transfer after clearing the fault succeeded.
 | SPI stuck | ETIMEDOUT after the deadline, device reset |
 | SPI 16-bit words, or a clock above `max_freq_hz` | `DCMD_SPI_SET_CONFIG` returns EINVAL |
 
-**The failing row: the back end process stopped.** When the back end process exits, QEMU 11.1.3 exits with it
-(`Connection to 127.0.0.1 closed by remote host`), so there is no guest left to check. This is QEMU's behaviour for
-a vhost-user device whose back end disconnects, not a driver result. Making QEMU listen and the back end reconnect
-(`server=on`) was tried: QEMU 11.1.3 then aborted at `memory_region_del_eventfd: Assertion ... failed` on the
-reconnect. "A device that disappears" is therefore covered by the per-address unplug rows and by the stuck rows
-(a controller that stops answering), not by the loss of the back end process.
+**The failing row: the back end process stopped.** What happens: when the back end process exits, QEMU 11.1.3 exits
+too, so no guest is left to test. That is how QEMU handles a vhost-user device whose back end goes away; the drivers
+are never asked. "A device that disappears" is covered instead by the per-chip unplug rows and by the stuck rows (a
+controller that stops answering).
+
+### QEMU 11.1.3 aborts when a vhost-user back end reconnects (reproduction)
+
+Making QEMU listen and the back end connect, so that a restarted back end could connect again, was tried and fails.
+Recorded here, not reported upstream.
+
+```bash
+# QEMU 11.1.3 built by scripts/build_qemu.sh; Patchbay's back end from this repository
+R=$(mktemp -d)
+PYTHONPATH=. python3.12 -m patchbay serve --connect --i2c $R/i2c.sock --control $R/c1.sock &   # back end 1
+~/Patchbay-work/qemu/bin/qemu-system-x86_64 -accel tcg -machine pc,memory-backend=mem -m 256M \
+  -object memory-backend-memfd,id=mem,size=256M,share=on \
+  -chardev socket,id=vi2c,path=$R/i2c.sock,server=on,wait=on -device vhost-user-i2c-pci,chardev=vi2c \
+  -display none -vga none -nodefaults -S -monitor none &
+sleep 6; kill %1; sleep 1                                                                    # back end 1 goes away
+PYTHONPATH=. python3.12 -m patchbay serve --connect --i2c $R/i2c.sock --control $R/c2.sock &   # back end 2 connects
+```
+
+QEMU prints `Failed to set msg fds.` then
+`../system/memory.c:2546: memory_region_del_eventfd: Assertion 'i != mr->ioeventfd_nb' failed.` and dumps core.
+The same QEMU with `reconnect-ms=500` on a client-mode chardev fails earlier, at start-up:
+`vhost_backend_init failed: Protocol error`, before the back end receives any message.
 
 ## A bug the fault matrix found
 
