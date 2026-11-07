@@ -73,7 +73,9 @@ class Connection:
 
     # --- offered features ------------------------------------------------------------------------------------------
     def offered_features(self) -> int:
-        return vu.VIRTIO_F_VERSION_1 | VIRTIO_RING_F_INDIRECT_DESC | vu.F_PROTOCOL_FEATURES | self.device.device_features
+        return (
+            vu.VIRTIO_F_VERSION_1 | VIRTIO_RING_F_INDIRECT_DESC | vu.F_PROTOCOL_FEATURES | self.device.device_features
+        )
 
     def offered_protocol(self) -> int:
         p = vu.Proto.REPLY_ACK
@@ -277,8 +279,13 @@ class Connection:
 class Server:
     """Listens on one Unix socket per device, accepts one front end per socket at a time, runs until stopped."""
 
-    def __init__(self, devices: dict[str, tuple[str, Device]], faults: FaultPlan, control_path: str | None,
-                 log: TextIO = sys.stdout) -> None:
+    def __init__(
+        self,
+        devices: dict[str, tuple[str, Device]],
+        faults: FaultPlan,
+        control_path: str | None,
+        log: TextIO = sys.stdout,
+    ) -> None:
         self.devices = devices
         self.faults = faults
         self.log = log
@@ -324,7 +331,7 @@ class Server:
                     self.sel.register(c, selectors.EVENT_READ, ("control", None))
                 elif kind == "control":
                     self._control(key.fileobj)  # type: ignore[arg-type]
-            for name, conn in list(self.conns.items()):
+            for conn in list(self.conns.values()):
                 for q in conn.queues:
                     conn.service(q)
 
@@ -410,8 +417,12 @@ class Server:
             cmd = req.get("cmd")
             if cmd == "fault":
                 f = Fault(
-                    kind=req["kind"], bus=req["bus"], target=req.get("target"), count=req.get("count"),
-                    delay_ms=int(req.get("delay_ms", 0)), seed=int(req.get("seed", 0)),
+                    kind=req["kind"],
+                    bus=req["bus"],
+                    target=req.get("target"),
+                    count=req.get("count"),
+                    delay_ms=int(req.get("delay_ms", 0)),
+                    seed=int(req.get("seed", 0)),
                 )
                 self.faults.add(f)
                 self.say(f"fault on: {f.describe()}")

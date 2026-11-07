@@ -1,9 +1,9 @@
 """Command line: run the back end, or drive its faults.
 
-  python -m patchbay serve --i2c run/i2c.sock --spi run/spi.sock --control run/control.sock
-  python -m patchbay ctl --control run/control.sock fault nak --bus i2c --target 0x28 --count 3
-  python -m patchbay ctl --control run/control.sock clear
-  python -m patchbay ctl --control run/control.sock status
+python -m patchbay serve --i2c run/i2c.sock --spi run/spi.sock --control run/control.sock
+python -m patchbay ctl --control run/control.sock fault nak --bus i2c --target 0x28 --count 3
+python -m patchbay ctl --control run/control.sock clear
+python -m patchbay ctl --control run/control.sock status
 """
 
 from __future__ import annotations

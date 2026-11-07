@@ -115,7 +115,7 @@ class DeviceRing:
 
     def _desc(self, table: int, idx: int) -> tuple[int, int, int, int]:
         try:
-            return struct.unpack_from("<QIHH", self.mem.view(table + DESC_SIZE * idx, DESC_SIZE))  # type: ignore[return-value]
+            return struct.unpack_from("<QIHH", self.mem.view(table + DESC_SIZE * idx, DESC_SIZE))
         except MemoryFault as e:
             raise RingError(str(e)) from e
 
