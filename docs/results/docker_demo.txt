@@ -1,0 +1,45 @@
+# docker compose up demo, run in WSL on 7 Nov 2026; containers and images listed here were removed by id afterwards
+$ docker images -q (before): []
+#9 unpacking to docker.io/library/patchbay:demo 0.0s done
+#9 DONE 0.2s
+
+#10 [demo] resolving provenance for metadata file
+#10 DONE 0.0s
+ demo  Built
+image patchbay:demo = 5fd80d18582a, base image = 
+ Container patchbay-check-demo-1  Created
+ Container patchbay-check-demo-1  Starting
+ Container patchbay-check-demo-1  Started
+container = 7a8e06cae6cb
+$ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8093/
+200
+$ curl -s http://127.0.0.1:8093/api/state | head -c 300
+{"mode": "recorded", "meta": {"type": "meta", "label": "Recorded session", "recorded": "2026-11-07 03:48", "guest": "QNX 8.0 x86_64 in QEMU 11.1.3, TCG", "how": "scripts/record_session.py against a guest started by scripts/run_guest.sh start", "samples": ["imu-bno055", "temp-humidity-sht3x", "mcp-30
+$ curl -s 'http://127.0.0.1:8093/api/events?since=0' | head -c 200
+{"events": [{"t": 0.0, "type": "i2c", "segs": [{"addr": 68, "dir": "W", "data": "3093", "ok": true}], "ok": true, "what": "SHT3x @0x44 break", "seq": 1, "lap": 0}, {"t": 0.0029, "type": "i2c", "segs":
+$ POST /api/fault (must be refused in a recorded session)
+{"error": "this is a recorded session; faults can only be injected live"} http=409
+$ docker exec: user
+uid=10001(patchbay) gid=999(patchbay) groups=999(patchbay)
+$ docker port
+8093/tcp -> 127.0.0.1:8093
+$ docker inspect: read-only rootfs, caps dropped, published binding
+ReadonlyRootfs=true CapDrop=[ALL] Ports=map[8093/tcp:[{127.0.0.1 8093}]] User=patchbay
+waiting for the HEALTHCHECK (start-period 10 s, interval 30 s)
+health: starting
+health: healthy
+$ docker logs
+patch panel (recorded session) on http://0.0.0.0:8093/
+ Container patchbay-check-demo-1  Removed
+ Network patchbay-check_default  Removing
+ Network patchbay-check_default  Removed
+container left: []
+Untagged: patchbay:demo
+Deleted: sha256:5fd80d18582abb92a4f5880e69cd7f4971376fb2bd50ff4cb702ee953cc24d7d
+Usage:  docker rmi [OPTIONS] IMAGE [IMAGE...]
+
+See 'docker rmi --help' for more information
+$ docker images -q (after): []
+
+# Note: the base image was not listed under its own name (the build had unpacked it into the same store), so the last rmi
+# printed its usage text. 'docker images -q' afterwards lists nothing: no image of this check is left.

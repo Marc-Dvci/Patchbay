@@ -133,12 +133,12 @@ fixed. The aarch64le build (`make -C driver ARCH=aarch64le`) produces `i2c-virti
 | Kind | Count | What |
 |---|---|---|
 | C unit | 17 tests, 106 checks | `driver/tests/test_core.c`: ring and framing, under AddressSanitizer and UBSan |
-| Python unit | 127 | device ring, vhost-user codec, BNO055, SHT3x, MCP3008, buses, faults, devices, decoder, panel API and replay |
+| Python unit | 150 | device ring, vhost-user codec, BNO055, SHT3x, MCP3008, buses, faults, devices, decoder, panel API and replay |
 | Cross | 13 | the driver's C core (host build, ctypes) against the back end's Python device in shared memory |
-| Integration | 11 | the back end's vhost-user state machine over real sockets, memfd and eventfds; a panel fault button reaching the back end's control socket |
+| Integration | 19 | the back end's vhost-user state machine over real sockets, memfd and eventfds, including headers and payloads that arrive in pieces; a panel fault button reaching the back end's control socket |
 | Browser (e2e) | 4 | the panel in headless Chromium: axe-core WCAG 2.2 AA at 1440 and 390 px (0 violations), recorded mode disables faults, a fault button from the keyboard |
 
-Coverage of the back end (`patchbay/`, lines and branches): 86 %. Mutation check (`scripts/mutation_check.sh`):
+Coverage of the back end (`patchbay/`, lines and branches): 89 %. Mutation check (`scripts/mutation_check.sh`):
 9 deliberate bugs in the C core, 9 caught, with a control run of the unmodified core first.
 
 One bug found by these tests is pinned by a regression test: the Python device read a `bits_per_word_mask` of 0 as

@@ -11,8 +11,8 @@ simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM,
 
 > [!TIP]
 > No QNX licence, no guest: `python3 -m patchbay panel --recorded` and open http://127.0.0.1:8093/. It replays a
-> session recorded from a real guest, and says so on the page. Or open this repository in a Codespace: the dev
-> container starts the same page.
+> session recorded from a real guest, and says so on the page. Or `docker compose up demo` (no keys, serves the same
+> page on 127.0.0.1:8093), or open this repository in a Codespace: the dev container starts the same page.
 
 | | |
 |---|---|
@@ -140,8 +140,8 @@ All figures and their commands are in [`docs/RESULTS.md`](docs/RESULTS.md). In s
 | Each of 9 deliberate bugs in the C core is caught | `scripts/mutation_check.sh` | `scripts/mutation_check.sh` |
 | Chip models match their data sheets' examples (CRC-8 0xBEEF → 0x92, BNO055 IDs, MCP3008 bit order) | `scripts/host_tests.sh` | `tests/unit/test_sht3x.py`, `test_bno055.py`, `test_mcp3008.py` |
 
-Tests: 17 C unit tests (106 checks, under ASan and UBSan) · 127 Python unit · 13 cross · 11 integration ·
-4 browser. Back end coverage, lines and branches: 86 %.
+Tests: 17 C unit tests (106 checks, under ASan and UBSan) · 150 Python unit · 13 cross · 19 integration ·
+4 browser. Back end coverage, lines and branches: 89 %.
 
 ## Build and run
 

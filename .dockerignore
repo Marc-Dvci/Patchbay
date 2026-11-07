@@ -1,8 +1,6 @@
-# An allowlist: nothing reaches a build unless it is named here, so keys, caches and runs cannot slip in.
+# An allowlist: nothing reaches a build unless it is named here, so keys, caches, guest files and runs cannot slip in.
 *
-!app/
-!web/
-!requirements.txt
+!patchbay/
 
 **/__pycache__
-web/node_modules
+**/*.pyc
