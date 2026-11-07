@@ -293,6 +293,18 @@ static int bring_up(struct pb_vpci *v, uint16_t max_qsize, char *err, size_t err
     return EOK;
 }
 
+/* How often a waiting transfer re-reads the used ring without an interrupt. PB_RECHECK_MS overrides the default
+ * (0 turns the re-check off), for diagnosing interrupt delivery. */
+static uint64_t recheck_ns(void)
+{
+    static int64_t ns = -1;
+    if (ns < 0) {
+        const char *e = getenv("PB_RECHECK_MS");
+        ns = (int64_t)(e != NULL ? strtoul(e, NULL, 0) : 10ul) * 1000000;
+    }
+    return (uint64_t)ns;
+}
+
 static void *irq_loop(void *arg)
 {
     struct pb_vpci *v = arg;
@@ -307,8 +319,9 @@ static void *irq_loop(void *arg)
         if (pulse.code != PULSE_IRQ) {
             continue;
         }
-        (void)r8(v->isr, 0);  /* reading the ISR status deasserts this device's line */
+        uint8_t isr = r8(v->isr, 0);  /* reading the ISR status deasserts this device's line */
         InterruptUnmask(v->irq, v->iid);  /* at once: the line may be shared with another driver */
+        trace("irq %d pulse, ISR %#x", v->irq, isr);
         pthread_mutex_lock(&v->lock);
         v->irq_count++;
         pthread_cond_broadcast(&v->cond);
@@ -332,6 +345,10 @@ static int start_irq(struct pb_vpci *v)
         return -1;
     }
     v->irq = irq;
+    uint8_t line = 0xFF, pin = 0;
+    pci_device_cfg_rd8(v->bdf, 0x3C, &line);
+    pci_device_cfg_rd8(v->bdf, 0x3D, &pin);
+    trace("PCI server irq %d; config space interrupt line %u, pin %u", irq, line, pin);
     if (pthread_create(&v->irq_thread, NULL, irq_loop, v) != EOK) {
         return -1;
     }
@@ -514,7 +531,8 @@ int pb_vpci_run(struct pb_vpci *v, const uint16_t *heads, unsigned n, uint32_t *
         if (v->iid >= 0) {
             /* Wake on the interrupt, or after 10 ms at most: on the shared INTx line an interrupt can go missing
              * (seen with spi-virtio, see docs/RESULTS.md), and then the used ring is read again anyway. */
-            uint64_t wake = t + 10000000ull < deadline ? t + 10000000ull : deadline;
+            uint64_t step = recheck_ns();
+            uint64_t wake = step != 0u && t + step < deadline ? t + step : deadline;
             struct timespec abs = { .tv_sec = (time_t)(wake / 1000000000ull),
                                     .tv_nsec = (long)(wake % 1000000000ull) };
             pthread_mutex_lock(&v->lock);
