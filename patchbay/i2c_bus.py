@@ -25,6 +25,7 @@ class Segment:
 class SegmentResult:
     ok: bool
     data: bytes = b""
+    hold_until: float | None = None  # a chip stretched the clock: the segment is not over before this clock time
 
 
 class I2cChip:
@@ -36,6 +37,11 @@ class I2cChip:
     def acks_address(self, read: bool) -> bool:
         """Whether the chip acknowledges its address for this direction now."""
         return True
+
+    def hold_until(self) -> float | None:
+        """Right after acks_address returned True: the clock time until which the chip holds SCL low (clock
+        stretching), or None if it does not. Asked once per acknowledged segment."""
+        return None
 
     def write(self, data: bytes) -> bool:
         """Bytes after the address byte. False means the chip did not acknowledge one of them."""
@@ -88,10 +94,11 @@ class I2cBus:
             return SegmentResult(ok=False)
         if not chip.acks_address(seg.read):
             return SegmentResult(ok=False)
+        hold = chip.hold_until()
         if not seg.read:
-            return SegmentResult(ok=chip.write(seg.data))
+            return SegmentResult(ok=chip.write(seg.data), hold_until=hold)
         data = chip.read(seg.length)
         f = self.faults.take("i2c", "corrupt", seg.addr)
         if f is not None:
             data = flip_one_bit(data, f.rng)
-        return SegmentResult(ok=True, data=data)
+        return SegmentResult(ok=True, data=data, hold_until=hold)

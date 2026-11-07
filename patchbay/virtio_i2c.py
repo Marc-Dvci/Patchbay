@@ -75,6 +75,7 @@ def answer(req: I2cRequest, ok: bool, data: bytes = b"") -> int:
 class Pending:
     group: list[I2cRequest]
     not_before: float
+    done: list[tuple[int, int]] | None = None  # set once the bus ran the group but a chip still holds the clock
 
 
 @dataclass
@@ -113,25 +114,38 @@ class VirtioI2c:
             self.partial.append(req)
             if not req.fail_next:
                 group, self.partial = self.partial, []
-                delay = self.faults.take("i2c", "delay")
+                delay = self.faults.take_any("i2c", "delay", {r.addr for r in group})
                 wait = delay.delay_ms / 1000.0 if delay else 0.0
                 self.pending.append(Pending(group, self.clock.now() + wait))
         return done + self.poll()
 
+    def _stuck(self, p: Pending) -> bool:
+        return self.faults.active_any("i2c", "stuck", {r.addr for r in p.group}) is not None
+
     def next_deadline(self) -> float | None:
-        if not self.pending or self.faults.active("i2c", "stuck"):
+        if not self.pending or self._stuck(self.pending[0]):
             return None
         return self.pending[0].not_before
 
     def poll(self) -> list[tuple[int, int]]:
+        """Complete what is due. The queue is served in order: a group a chip holds on the clock stretch (SHT3x)
+        keeps the groups behind it waiting, as it would keep the bus."""
         done: list[tuple[int, int]] = []
         now = self.clock.now()
-        while self.pending and not self.faults.active("i2c", "stuck") and self.pending[0].not_before <= now:
-            done.extend(self._run(self.pending.pop(0).group))
+        while self.pending and not self._stuck(self.pending[0]) and self.pending[0].not_before <= now:
+            p = self.pending[0]
+            if p.done is None:
+                p.done, hold = self._run(p.group)
+                if hold is not None and hold > now:
+                    p.not_before = hold
+                    continue
+            done.extend(p.done)
+            self.pending.pop(0)
         return done
 
-    def _run(self, group: list[I2cRequest]) -> list[tuple[int, int]]:
-        if self.faults.take("i2c", "error") or not all(r.valid for r in group):
+    def _run(self, group: list[I2cRequest]) -> tuple[list[tuple[int, int]], float | None]:
+        """Run one group on the bus. Returns its completions and the time a clock-stretching chip lets go, if any."""
+        if self.faults.take_any("i2c", "error", {r.addr for r in group}) or not all(r.valid for r in group):
             self.failed += 1
             self._trace(group, None)
             if self.events is not None:
@@ -145,7 +159,7 @@ class VirtioI2c:
                         "what": "controller error: transfer refused before the bus",
                     }
                 )
-            return [(r.chain.head, answer(r, False)) for r in group]
+            return [(r.chain.head, answer(r, False)) for r in group], None
         segs = [Segment(r.addr, r.read, r.data, r.read_len) for r in group]
         results = self.bus.transfer(segs)
         if all(res.ok for res in results):
@@ -167,7 +181,10 @@ class VirtioI2c:
                     "what": describe_i2c(wire),
                 }
             )
-        return [(r.chain.head, answer(r, res.ok, res.data)) for r, res in zip(group, results, strict=True)]
+        holds = [res.hold_until for res in results if res.hold_until is not None]
+        return [(r.chain.head, answer(r, res.ok, res.data)) for r, res in zip(group, results, strict=True)], (
+            max(holds) if holds else None
+        )
 
     def _trace(self, group: list[I2cRequest], oks: list[bool] | None) -> None:
         if self.trace is None:

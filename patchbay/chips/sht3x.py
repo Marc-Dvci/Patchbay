@@ -77,6 +77,7 @@ class Sht3x(I2cChip):
         self.status = STATUS_ALERT | STATUS_RESET
         self.ready_at = clock.now()
         self.pending: tuple[float, bool] | None = None  # (done at, clock stretching)
+        self._hold: float | None = None
         self.out: bytes = b""
         self.measurements = 0
 
@@ -94,10 +95,16 @@ class Sht3x(I2cChip):
         if self.pending is not None:
             done_at, stretching = self.pending
             if now >= done_at or stretching:
+                if now < done_at:
+                    self._hold = done_at  # SCL stays low until the measurement is done
                 self._finish_measurement(max(now, done_at))
                 return True
             return False
         return False  # no data to read
+
+    def hold_until(self) -> float | None:
+        hold, self._hold = self._hold, None
+        return hold
 
     def _finish_measurement(self, at: float) -> None:
         t, rh = self.climate(at - self.t0)

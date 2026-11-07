@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import struct
+
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
@@ -9,6 +11,14 @@ from hypothesis import strategies as st
 from patchbay.chips import sht3x as s
 from patchbay.clock import FakeClock
 from patchbay.i2c_bus import I2cBus, Segment
+from patchbay.virtio_i2c import FLAGS_FAIL_NEXT, FLAGS_M_RD, MSG_OK, VirtioI2c
+from tests.ringkit import Arena, DriverRing
+
+FLAGS_NONE = 0
+
+
+def hdr(flags: int) -> bytes:
+    return struct.pack("<HHI", 0x44 << 1, 0, flags)
 
 
 def setup() -> tuple[FakeClock, s.Sht3x, I2cBus]:
@@ -60,12 +70,74 @@ def test_without_clock_stretching_a_read_before_the_measurement_is_done_is_not_a
     assert s.crc8(data[0:2]) == data[2] and s.crc8(data[3:5]) == data[5]
 
 
-def test_with_clock_stretching_an_early_read_succeeds() -> None:
+def test_with_clock_stretching_an_early_read_succeeds_but_holds_the_bus_until_the_measurement_is_done() -> None:
     clock, chip, bus = setup()
     assert cmd(bus, 0x2C06)  # the command the QNX sample sends
+    started = clock.now()
     clock.advance(0.001)
-    assert rd(bus) is not None
+    res = bus.transfer([Segment(0x44, True, length=6)])[0]
+    assert res.ok and len(res.data) == 6
+    assert res.hold_until == pytest.approx(started + 0.0125)
     assert chip.measurements == 1
+
+
+def test_a_read_after_the_measurement_time_does_not_hold_the_bus() -> None:
+    clock, _, bus = setup()
+    cmd(bus, 0x2C06)
+    clock.advance(0.0125)
+    assert bus.transfer([Segment(0x44, True, length=6)])[0].hold_until is None
+
+
+def stretching_rig() -> tuple[FakeClock, VirtioI2c, Arena, DriverRing]:
+    clock, _, bus = setup()
+    a = Arena()
+    return clock, VirtioI2c(bus, bus.faults, clock), a, DriverRing(a, size=8)
+
+
+def test_a_stretching_read_is_incomplete_before_12_5_ms_and_complete_at_that_time() -> None:
+    clock, dev, a, d = stretching_rig()
+    ring = d.device()
+    _, cmd_ins = d.add([hdr(FLAGS_NONE), bytes([0x2C, 0x06])], [1])
+    assert len(dev.kick(ring)) == 1  # the command itself is acknowledged at once
+    sent = clock.now()
+    _, ins = d.add([hdr(FLAGS_M_RD)], [7])
+    assert dev.kick(ring) == []
+    assert dev.next_deadline() == pytest.approx(sent + 0.0125)
+    clock.advance(0.0124)
+    assert dev.poll() == []
+    clock.advance(0.0001)
+    done = dev.poll()
+    assert len(done) == 1
+    reply = a.read(ins[0], 7)
+    assert reply[-1] == MSG_OK and s.crc8(reply[0:2]) == reply[2] and s.crc8(reply[3:5]) == reply[5]
+    assert dev.next_deadline() is None
+    assert a.read(cmd_ins[0], 1) == bytes([MSG_OK])
+
+
+def test_a_command_and_a_stretching_read_in_one_group_complete_together_at_12_5_ms() -> None:
+    clock, dev, a, d = stretching_rig()
+    ring = d.device()
+    sent = clock.now()
+    d.add([hdr(FLAGS_FAIL_NEXT), bytes([0x2C, 0x06])], [1])
+    _, ins = d.add([hdr(FLAGS_M_RD)], [7])
+    assert dev.kick(ring) == []
+    clock.advance(0.0124)
+    assert dev.poll() == []
+    clock.advance(0.0001)
+    assert len(dev.poll()) == 2
+    assert clock.now() >= sent + 0.0125 and a.read(ins[0], 7)[-1] == MSG_OK
+
+
+def test_a_request_queued_behind_a_stretching_read_waits_for_it() -> None:
+    clock, dev, a, d = stretching_rig()
+    ring = d.device()
+    d.add([hdr(FLAGS_NONE), bytes([0x2C, 0x06])], [1])
+    dev.kick(ring)
+    d.add([hdr(FLAGS_M_RD)], [7])
+    d.add([hdr(FLAGS_NONE)], [1])  # an address probe, queued behind the read
+    assert dev.kick(ring) == []
+    clock.advance(0.0125)
+    assert len(dev.poll()) == 2
 
 
 def test_data_is_read_once() -> None:
