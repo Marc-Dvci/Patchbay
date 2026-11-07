@@ -1,7 +1,7 @@
 QNX patchbay 8.0.0 2026/06/05-16:26:03EDT x86pc x86_64
   303124 i2c-virtio -t 1000 
   315413 spi-virtio -c /system/etc/spi-virtio.conf 
-  671770 grep -E virtio 
+  921625 grep -E virtio 
 /dev/i2c1
 /dev/io-spi/spi0/dev0
 /dev/io-spi/spi0/dev1

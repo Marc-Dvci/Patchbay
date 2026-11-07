@@ -31,446 +31,428 @@ Setting final operation mode to NDOF...
 
 --- Starting Continuous Data Readout ---
 --------------------------------------------------
-Euler (H,R,P):         115.00,    7.88,   -4.50 deg
-Quaternion (W,X,Y,Z):    0.53,    0.07,    0.04,    0.84
-Accelerometer (m/s^2):  X=   0.90, Y=   1.43, Z=   9.69
-Linear Accel (m/s^2):   X=   0.14, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=   0.77, Y=   1.33, Z=   9.69
-Gyroscope (dps):        X=  -1.06, Y=   1.00, Z=  10.00
-Magnetometer (uT):      X= -12.56, Y= -25.38, Z= -38.06
+Euler (H,R,P):         341.25,   -7.38,    0.69 deg
+Quaternion (W,X,Y,Z):   -0.98,    0.06,   -0.02,    0.16
+Accelerometer (m/s^2):  X=  -0.13, Y=  -1.28, Z=   9.72
+Linear Accel (m/s^2):   X=  -0.01, Y=  -0.02, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.12, Y=  -1.26, Z=   9.72
+Gyroscope (dps):        X=   2.13, Y=   2.25, Z=  10.00
+Magnetometer (uT):      X=  21.31, Y=  12.38, Z= -40.50
 --------------------------------------------------
-Euler (H,R,P):         116.06,    7.69,   -4.38 deg
-Quaternion (W,X,Y,Z):    0.53,    0.07,    0.04,    0.85
-Accelerometer (m/s^2):  X=   0.86, Y=   1.41, Z=   9.69
-Linear Accel (m/s^2):   X=   0.12, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=   0.75, Y=   1.31, Z=   9.69
-Gyroscope (dps):        X=  -1.50, Y=   1.13, Z=  10.00
-Magnetometer (uT):      X= -12.81, Y= -25.13, Z= -38.13
+Euler (H,R,P):         342.25,   -7.19,    0.94 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.06,   -0.02,    0.15
+Accelerometer (m/s^2):  X=  -0.20, Y=  -1.25, Z=   9.73
+Linear Accel (m/s^2):   X=  -0.04, Y=  -0.03, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.16, Y=  -1.22, Z=   9.73
+Gyroscope (dps):        X=   2.50, Y=   2.19, Z=  10.00
+Magnetometer (uT):      X=  21.63, Y=  11.81, Z= -40.50
 --------------------------------------------------
-Euler (H,R,P):         117.13,    7.56,   -4.25 deg
-Quaternion (W,X,Y,Z):    0.52,    0.07,    0.04,    0.85
-Accelerometer (m/s^2):  X=   0.82, Y=   1.38, Z=   9.70
-Linear Accel (m/s^2):   X=   0.09, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=   0.73, Y=   1.28, Z=   9.70
-Gyroscope (dps):        X=  -1.88, Y=   1.19, Z=  10.00
-Magnetometer (uT):      X= -13.13, Y= -24.81, Z= -38.25
+Euler (H,R,P):         343.25,   -6.88,    1.13 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.06,   -0.02,    0.14
+Accelerometer (m/s^2):  X=  -0.26, Y=  -1.21, Z=   9.73
+Linear Accel (m/s^2):   X=  -0.06, Y=  -0.04, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.20, Y=  -1.17, Z=   9.73
+Gyroscope (dps):        X=   2.88, Y=   2.19, Z=  10.00
+Magnetometer (uT):      X=  21.88, Y=  11.25, Z= -40.50
 --------------------------------------------------
-Euler (H,R,P):         118.13,    7.31,   -4.13 deg
-Quaternion (W,X,Y,Z):    0.51,    0.06,    0.04,    0.86
-Accelerometer (m/s^2):  X=   0.77, Y=   1.34, Z=   9.70
-Linear Accel (m/s^2):   X=   0.07, Y=   0.09, Z=   0.00
-Gravity Vector (m/s^2): X=   0.70, Y=   1.24, Z=   9.70
-Gyroscope (dps):        X=  -2.25, Y=   1.25, Z=  10.00
-Magnetometer (uT):      X= -13.38, Y= -24.50, Z= -38.31
+Euler (H,R,P):         344.25,   -6.56,    1.38 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.06,   -0.02,    0.14
+Accelerometer (m/s^2):  X=  -0.32, Y=  -1.17, Z=   9.74
+Linear Accel (m/s^2):   X=  -0.09, Y=  -0.05, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.23, Y=  -1.12, Z=   9.74
+Gyroscope (dps):        X=   3.19, Y=   2.19, Z=  10.00
+Magnetometer (uT):      X=  22.19, Y=  10.69, Z= -40.50
 --------------------------------------------------
-Euler (H,R,P):         119.19,    7.06,   -4.00 deg
-Quaternion (W,X,Y,Z):    0.50,    0.06,    0.04,    0.86
-Accelerometer (m/s^2):  X=   0.72, Y=   1.29, Z=   9.71
-Linear Accel (m/s^2):   X=   0.04, Y=   0.09, Z=   0.00
-Gravity Vector (m/s^2): X=   0.68, Y=   1.20, Z=   9.71
-Gyroscope (dps):        X=  -2.63, Y=   1.38, Z=  10.00
-Magnetometer (uT):      X= -13.63, Y= -24.13, Z= -38.50
+Euler (H,R,P):         345.31,   -6.25,    1.56 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.05,   -0.02,    0.13
+Accelerometer (m/s^2):  X=  -0.38, Y=  -1.12, Z=   9.74
+Linear Accel (m/s^2):   X=  -0.11, Y=  -0.06, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.27, Y=  -1.06, Z=   9.74
+Gyroscope (dps):        X=   3.50, Y=   2.13, Z=  10.00
+Magnetometer (uT):      X=  22.44, Y=  10.06, Z= -40.56
 --------------------------------------------------
-Euler (H,R,P):         120.25,    6.75,   -3.81 deg
-Quaternion (W,X,Y,Z):    0.49,    0.06,    0.03,    0.87
-Accelerometer (m/s^2):  X=   0.67, Y=   1.23, Z=   9.72
-Linear Accel (m/s^2):   X=   0.01, Y=   0.08, Z=   0.00
-Gravity Vector (m/s^2): X=   0.65, Y=   1.15, Z=   9.72
-Gyroscope (dps):        X=  -3.00, Y=   1.44, Z=  10.00
-Magnetometer (uT):      X= -13.88, Y= -23.69, Z= -38.63
+Euler (H,R,P):         346.31,   -5.88,    1.81 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.05,   -0.02,    0.12
+Accelerometer (m/s^2):  X=  -0.44, Y=  -1.07, Z=   9.75
+Linear Accel (m/s^2):   X=  -0.13, Y=  -0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.31, Y=  -1.00, Z=   9.75
+Gyroscope (dps):        X=   3.81, Y=   2.13, Z=  10.00
+Magnetometer (uT):      X=  22.69, Y=   9.38, Z= -40.56
 --------------------------------------------------
-Euler (H,R,P):         121.31,    6.44,   -3.69 deg
-Quaternion (W,X,Y,Z):    0.49,    0.06,    0.03,    0.87
-Accelerometer (m/s^2):  X=   0.61, Y=   1.17, Z=   9.73
-Linear Accel (m/s^2):   X=  -0.01, Y=   0.07, Z=   0.00
-Gravity Vector (m/s^2): X=   0.63, Y=   1.09, Z=   9.73
-Gyroscope (dps):        X=  -3.31, Y=   1.50, Z=  10.00
-Magnetometer (uT):      X= -14.13, Y= -23.25, Z= -38.81
+Euler (H,R,P):         347.31,   -5.50,    2.00 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.05,   -0.02,    0.11
+Accelerometer (m/s^2):  X=  -0.49, Y=  -1.01, Z=   9.76
+Linear Accel (m/s^2):   X=  -0.15, Y=  -0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.34, Y=  -0.93, Z=   9.76
+Gyroscope (dps):        X=   4.06, Y=   2.06, Z=  10.00
+Magnetometer (uT):      X=  22.94, Y=   8.75, Z= -40.56
 --------------------------------------------------
-Euler (H,R,P):         122.38,    6.06,   -3.50 deg
-Quaternion (W,X,Y,Z):    0.48,    0.05,    0.03,    0.88
-Accelerometer (m/s^2):  X=   0.56, Y=   1.09, Z=   9.73
-Linear Accel (m/s^2):   X=  -0.04, Y=   0.06, Z=   0.00
-Gravity Vector (m/s^2): X=   0.60, Y=   1.03, Z=   9.73
-Gyroscope (dps):        X=  -3.69, Y=   1.63, Z=  10.00
-Magnetometer (uT):      X= -14.31, Y= -22.81, Z= -39.00
---------------------------------------------------
-Euler (H,R,P):         123.44,    5.63,   -3.31 deg
-Quaternion (W,X,Y,Z):    0.47,    0.05,    0.03,    0.88
-Accelerometer (m/s^2):  X=   0.50, Y=   1.02, Z=   9.74
-Linear Accel (m/s^2):   X=  -0.07, Y=   0.05, Z=   0.00
-Gravity Vector (m/s^2): X=   0.57, Y=   0.96, Z=   9.74
-Gyroscope (dps):        X=  -4.00, Y=   1.69, Z=  10.00
-Magnetometer (uT):      X= -14.56, Y= -22.31, Z= -39.25
---------------------------------------------------
-Euler (H,R,P):         124.50,    5.19,   -3.13 deg
-Quaternion (W,X,Y,Z):    0.46,    0.05,    0.03,    0.88
-Accelerometer (m/s^2):  X=   0.45, Y=   0.93, Z=   9.75
-Linear Accel (m/s^2):   X=  -0.09, Y=   0.04, Z=   0.00
-Gravity Vector (m/s^2): X=   0.54, Y=   0.89, Z=   9.75
-Gyroscope (dps):        X=  -4.25, Y=   1.75, Z=  10.00
-Magnetometer (uT):      X= -14.75, Y= -21.81, Z= -39.44
---------------------------------------------------
-Euler (H,R,P):         125.56,    4.75,   -2.94 deg
-Quaternion (W,X,Y,Z):    0.46,    0.04,    0.02,    0.89
-Accelerometer (m/s^2):  X=   0.39, Y=   0.84, Z=   9.76
-Linear Accel (m/s^2):   X=  -0.12, Y=   0.03, Z=   0.00
-Gravity Vector (m/s^2): X=   0.51, Y=   0.81, Z=   9.76
-Gyroscope (dps):        X=  -4.50, Y=   1.81, Z=  10.00
-Magnetometer (uT):      X= -14.94, Y= -21.25, Z= -39.69
---------------------------------------------------
-Euler (H,R,P):         126.63,    4.25,   -2.75 deg
-Quaternion (W,X,Y,Z):    0.45,    0.04,    0.02,    0.89
-Accelerometer (m/s^2):  X=   0.34, Y=   0.75, Z=   9.77
-Linear Accel (m/s^2):   X=  -0.14, Y=   0.02, Z=   0.00
-Gravity Vector (m/s^2): X=   0.47, Y=   0.73, Z=   9.77
-Gyroscope (dps):        X=  -4.75, Y=   1.88, Z=  10.00
-Magnetometer (uT):      X= -15.13, Y= -20.69, Z= -39.88
---------------------------------------------------
-Euler (H,R,P):         127.69,    3.75,   -2.56 deg
-Quaternion (W,X,Y,Z):    0.44,    0.03,    0.02,    0.90
-Accelerometer (m/s^2):  X=   0.28, Y=   0.65, Z=   9.78
-Linear Accel (m/s^2):   X=  -0.16, Y=   0.01, Z=   0.00
-Gravity Vector (m/s^2): X=   0.44, Y=   0.64, Z=   9.78
-Gyroscope (dps):        X=  -4.94, Y=   1.94, Z=  10.00
-Magnetometer (uT):      X= -15.31, Y= -20.06, Z= -40.13
---------------------------------------------------
-Euler (H,R,P):         128.75,    3.19,   -2.38 deg
-Quaternion (W,X,Y,Z):    0.43,    0.03,    0.02,    0.90
-Accelerometer (m/s^2):  X=   0.23, Y=   0.55, Z=   9.78
-Linear Accel (m/s^2):   X=  -0.17, Y=   0.00, Z=   0.00
-Gravity Vector (m/s^2): X=   0.40, Y=   0.55, Z=   9.78
-Gyroscope (dps):        X=  -5.13, Y=   2.00, Z=  10.00
-Magnetometer (uT):      X= -15.50, Y= -19.44, Z= -40.38
---------------------------------------------------
-Euler (H,R,P):         129.81,    2.69,   -2.13 deg
-Quaternion (W,X,Y,Z):    0.42,    0.03,    0.01,    0.91
-Accelerometer (m/s^2):  X=   0.18, Y=   0.44, Z=   9.79
-Linear Accel (m/s^2):   X=  -0.18, Y=  -0.01, Z=   0.00
-Gravity Vector (m/s^2): X=   0.37, Y=   0.45, Z=   9.79
-Gyroscope (dps):        X=  -5.31, Y=   2.06, Z=  10.00
-Magnetometer (uT):      X= -15.63, Y= -18.81, Z= -40.63
---------------------------------------------------
-Euler (H,R,P):         130.88,    2.13,   -1.94 deg
-Quaternion (W,X,Y,Z):    0.42,    0.02,    0.01,    0.91
-Accelerometer (m/s^2):  X=   0.14, Y=   0.33, Z=   9.79
-Linear Accel (m/s^2):   X=  -0.19, Y=  -0.03, Z=   0.00
-Gravity Vector (m/s^2): X=   0.33, Y=   0.36, Z=   9.79
-Gyroscope (dps):        X=  -5.38, Y=   2.06, Z=  10.00
-Magnetometer (uT):      X= -15.81, Y= -18.13, Z= -40.88
---------------------------------------------------
-Euler (H,R,P):         131.94,    1.50,   -1.69 deg
-Quaternion (W,X,Y,Z):    0.41,    0.02,    0.01,    0.91
-Accelerometer (m/s^2):  X=   0.09, Y=   0.22, Z=   9.80
-Linear Accel (m/s^2):   X=  -0.20, Y=  -0.04, Z=   0.00
-Gravity Vector (m/s^2): X=   0.29, Y=   0.26, Z=   9.80
-Gyroscope (dps):        X=  -5.50, Y=   2.13, Z=  10.00
-Magnetometer (uT):      X= -15.94, Y= -17.44, Z= -41.13
---------------------------------------------------
-Euler (H,R,P):         133.00,    0.94,   -1.50 deg
-Quaternion (W,X,Y,Z):    0.40,    0.01,    0.00,    0.92
-Accelerometer (m/s^2):  X=   0.05, Y=   0.11, Z=   9.80
-Linear Accel (m/s^2):   X=  -0.20, Y=  -0.05, Z=   0.00
-Gravity Vector (m/s^2): X=   0.25, Y=   0.16, Z=   9.80
-Gyroscope (dps):        X=  -5.56, Y=   2.13, Z=  10.00
-Magnetometer (uT):      X= -16.06, Y= -16.75, Z= -41.31
---------------------------------------------------
-Euler (H,R,P):         134.00,    0.38,   -1.25 deg
-Quaternion (W,X,Y,Z):    0.39,    0.01,   -0.00,    0.92
-Accelerometer (m/s^2):  X=   0.02, Y=   0.00, Z=   9.80
-Linear Accel (m/s^2):   X=  -0.20, Y=  -0.06, Z=   0.00
-Gravity Vector (m/s^2): X=   0.21, Y=   0.06, Z=   9.80
-Gyroscope (dps):        X=  -5.63, Y=   2.19, Z=  10.00
-Magnetometer (uT):      X= -16.19, Y= -16.06, Z= -41.56
---------------------------------------------------
-Euler (H,R,P):         135.06,   -0.25,   -1.00 deg
-Quaternion (W,X,Y,Z):    0.38,    0.01,   -0.01,    0.92
-Accelerometer (m/s^2):  X=  -0.02, Y=  -0.11, Z=   9.81
-Linear Accel (m/s^2):   X=  -0.19, Y=  -0.07, Z=   0.00
-Gravity Vector (m/s^2): X=   0.17, Y=  -0.04, Z=   9.81
-Gyroscope (dps):        X=  -5.63, Y=   2.19, Z=  10.00
-Magnetometer (uT):      X= -16.31, Y= -15.38, Z= -41.81
---------------------------------------------------
-Euler (H,R,P):         136.13,   -0.81,   -0.75 deg
-Quaternion (W,X,Y,Z):    0.37,    0.00,   -0.01,    0.93
-Accelerometer (m/s^2):  X=  -0.05, Y=  -0.22, Z=   9.80
-Linear Accel (m/s^2):   X=  -0.18, Y=  -0.07, Z=   0.00
-Gravity Vector (m/s^2): X=   0.13, Y=  -0.15, Z=   9.80
-Gyroscope (dps):        X=  -5.56, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.44, Y= -14.63, Z= -42.00
---------------------------------------------------
-Euler (H,R,P):         137.19,   -1.44,   -0.56 deg
-Quaternion (W,X,Y,Z):    0.36,   -0.00,   -0.01,    0.93
-Accelerometer (m/s^2):  X=  -0.08, Y=  -0.33, Z=   9.80
+Euler (H,R,P):         348.31,   -5.06,    2.19 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.04,   -0.02,    0.10
+Accelerometer (m/s^2):  X=  -0.54, Y=  -0.94, Z=   9.76
 Linear Accel (m/s^2):   X=  -0.17, Y=  -0.08, Z=   0.00
-Gravity Vector (m/s^2): X=   0.09, Y=  -0.25, Z=   9.80
-Gyroscope (dps):        X=  -5.50, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.56, Y= -13.88, Z= -42.19
+Gravity Vector (m/s^2): X=  -0.38, Y=  -0.86, Z=   9.76
+Gyroscope (dps):        X=   4.38, Y=   2.00, Z=  10.00
+Magnetometer (uT):      X=  23.13, Y=   8.06, Z= -40.56
 --------------------------------------------------
-Euler (H,R,P):         138.25,   -2.00,   -0.31 deg
-Quaternion (W,X,Y,Z):    0.36,   -0.00,   -0.02,    0.93
-Accelerometer (m/s^2):  X=  -0.10, Y=  -0.43, Z=   9.80
+Euler (H,R,P):         349.38,   -4.56,    2.44 deg
+Quaternion (W,X,Y,Z):   -0.99,    0.04,   -0.02,    0.09
+Accelerometer (m/s^2):  X=  -0.59, Y=  -0.87, Z=   9.77
+Linear Accel (m/s^2):   X=  -0.18, Y=  -0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.41, Y=  -0.78, Z=   9.77
+Gyroscope (dps):        X=   4.56, Y=   1.94, Z=  10.00
+Magnetometer (uT):      X=  23.38, Y=   7.31, Z= -40.56
+--------------------------------------------------
+Euler (H,R,P):         350.38,   -4.13,    2.63 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.03,   -0.03,    0.08
+Accelerometer (m/s^2):  X=  -0.64, Y=  -0.79, Z=   9.77
+Linear Accel (m/s^2):   X=  -0.19, Y=  -0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.45, Y=  -0.70, Z=   9.77
+Gyroscope (dps):        X=   4.81, Y=   1.94, Z=  10.00
+Magnetometer (uT):      X=  23.56, Y=   6.63, Z= -40.63
+--------------------------------------------------
+Euler (H,R,P):         351.38,   -3.63,    2.81 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.03,   -0.03,    0.07
+Accelerometer (m/s^2):  X=  -0.68, Y=  -0.71, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.20, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.48, Y=  -0.62, Z=   9.78
+Gyroscope (dps):        X=   5.00, Y=   1.88, Z=  10.00
+Magnetometer (uT):      X=  23.81, Y=   5.88, Z= -40.63
+--------------------------------------------------
+Euler (H,R,P):         352.38,   -3.13,    3.00 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.03,   -0.03,    0.07
+Accelerometer (m/s^2):  X=  -0.71, Y=  -0.63, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.20, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.51, Y=  -0.53, Z=   9.78
+Gyroscope (dps):        X=   5.19, Y=   1.81, Z=  10.00
+Magnetometer (uT):      X=  24.00, Y=   5.13, Z= -40.56
+--------------------------------------------------
+Euler (H,R,P):         353.38,   -2.56,    3.19 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.02,   -0.03,    0.06
+Accelerometer (m/s^2):  X=  -0.74, Y=  -0.54, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.20, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.54, Y=  -0.44, Z=   9.78
+Gyroscope (dps):        X=   5.31, Y=   1.75, Z=  10.00
+Magnetometer (uT):      X=  24.13, Y=   4.38, Z= -40.56
+--------------------------------------------------
+Euler (H,R,P):         354.44,   -2.00,    3.38 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.02,   -0.03,    0.05
+Accelerometer (m/s^2):  X=  -0.77, Y=  -0.44, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.20, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.57, Y=  -0.34, Z=   9.78
+Gyroscope (dps):        X=   5.44, Y=   1.69, Z=  10.00
+Magnetometer (uT):      X=  24.31, Y=   3.56, Z= -40.56
+--------------------------------------------------
+Euler (H,R,P):         355.44,   -1.44,    3.50 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.01,   -0.03,    0.04
+Accelerometer (m/s^2):  X=  -0.79, Y=  -0.35, Z=   9.79
+Linear Accel (m/s^2):   X=  -0.19, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.60, Y=  -0.25, Z=   9.79
+Gyroscope (dps):        X=   5.50, Y=   1.63, Z=  10.00
+Magnetometer (uT):      X=  24.44, Y=   2.75, Z= -40.50
+--------------------------------------------------
+Euler (H,R,P):         356.50,   -0.88,    3.69 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.01,   -0.03,    0.03
+Accelerometer (m/s^2):  X=  -0.81, Y=  -0.25, Z=   9.79
+Linear Accel (m/s^2):   X=  -0.18, Y=  -0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.63, Y=  -0.15, Z=   9.79
+Gyroscope (dps):        X=   5.56, Y=   1.50, Z=  10.00
+Magnetometer (uT):      X=  24.63, Y=   2.00, Z= -40.50
+--------------------------------------------------
+Euler (H,R,P):         357.50,   -0.31,    3.81 deg
+Quaternion (W,X,Y,Z):   -1.00,    0.00,   -0.03,    0.02
+Accelerometer (m/s^2):  X=  -0.82, Y=  -0.15, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.17, Y=  -0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.65, Y=  -0.05, Z=   9.78
+Gyroscope (dps):        X=   5.63, Y=   1.44, Z=  10.00
+Magnetometer (uT):      X=  24.75, Y=   1.19, Z= -40.44
+--------------------------------------------------
+Euler (H,R,P):         358.50,    0.25,    4.00 deg
+Quaternion (W,X,Y,Z):   -1.00,   -0.00,   -0.03,    0.01
+Accelerometer (m/s^2):  X=  -0.83, Y=  -0.04, Z=   9.78
 Linear Accel (m/s^2):   X=  -0.15, Y=  -0.09, Z=   0.00
-Gravity Vector (m/s^2): X=   0.05, Y=  -0.34, Z=   9.80
-Gyroscope (dps):        X=  -5.44, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.63, Y= -13.19, Z= -42.38
+Gravity Vector (m/s^2): X=  -0.68, Y=   0.04, Z=   9.78
+Gyroscope (dps):        X=   5.63, Y=   1.38, Z=  10.00
+Magnetometer (uT):      X=  24.88, Y=   0.38, Z= -40.38
 --------------------------------------------------
-Euler (H,R,P):         139.31,   -2.56,   -0.06 deg
-Quaternion (W,X,Y,Z):    0.35,   -0.01,   -0.02,    0.94
-Accelerometer (m/s^2):  X=  -0.12, Y=  -0.53, Z=   9.80
-Linear Accel (m/s^2):   X=  -0.13, Y=  -0.09, Z=   0.00
-Gravity Vector (m/s^2): X=   0.01, Y=  -0.44, Z=   9.80
-Gyroscope (dps):        X=  -5.31, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.75, Y= -12.44, Z= -42.56
+Euler (H,R,P):         359.56,    0.81,    4.13 deg
+Quaternion (W,X,Y,Z):   -1.00,   -0.01,   -0.04,    0.00
+Accelerometer (m/s^2):  X=  -0.83, Y=   0.06, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.13, Y=  -0.08, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.70, Y=   0.14, Z=   9.78
+Gyroscope (dps):        X=   5.56, Y=   1.31, Z=  10.00
+Magnetometer (uT):      X=  24.94, Y=  -0.38, Z= -40.31
 --------------------------------------------------
-Euler (H,R,P):         140.38,   -3.13,    0.19 deg
-Quaternion (W,X,Y,Z):    0.34,   -0.01,   -0.03,    0.94
-Accelerometer (m/s^2):  X=  -0.14, Y=  -0.63, Z=   9.79
-Linear Accel (m/s^2):   X=  -0.11, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.03, Y=  -0.54, Z=   9.79
-Gyroscope (dps):        X=  -5.13, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.81, Y= -11.69, Z= -42.75
+Euler (H,R,P):           0.56,    1.38,    4.25 deg
+Quaternion (W,X,Y,Z):    1.00,    0.01,    0.04,    0.00
+Accelerometer (m/s^2):  X=  -0.83, Y=   0.16, Z=   9.78
+Linear Accel (m/s^2):   X=  -0.11, Y=  -0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.72, Y=   0.24, Z=   9.78
+Gyroscope (dps):        X=   5.50, Y=   1.19, Z=  10.00
+Magnetometer (uT):      X=  25.06, Y=  -1.19, Z= -40.25
 --------------------------------------------------
-Euler (H,R,P):         141.44,   -3.69,    0.38 deg
-Quaternion (W,X,Y,Z):    0.33,   -0.01,   -0.03,    0.94
-Accelerometer (m/s^2):  X=  -0.16, Y=  -0.72, Z=   9.79
-Linear Accel (m/s^2):   X=  -0.09, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.07, Y=  -0.63, Z=   9.79
-Gyroscope (dps):        X=  -5.00, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -16.88, Y= -11.00, Z= -42.94
+Euler (H,R,P):           1.56,    1.94,    4.38 deg
+Quaternion (W,X,Y,Z):    1.00,    0.02,    0.04,    0.01
+Accelerometer (m/s^2):  X=  -0.83, Y=   0.26, Z=   9.77
+Linear Accel (m/s^2):   X=  -0.09, Y=  -0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.74, Y=   0.33, Z=   9.77
+Gyroscope (dps):        X=   5.44, Y=   1.13, Z=  10.00
+Magnetometer (uT):      X=  25.13, Y=  -2.00, Z= -40.19
 --------------------------------------------------
-Euler (H,R,P):         142.50,   -4.19,    0.63 deg
-Quaternion (W,X,Y,Z):    0.32,   -0.02,   -0.03,    0.95
-Accelerometer (m/s^2):  X=  -0.17, Y=  -0.81, Z=   9.78
-Linear Accel (m/s^2):   X=  -0.06, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.11, Y=  -0.72, Z=   9.78
-Gyroscope (dps):        X=  -4.75, Y=   2.25, Z=  10.00
-Magnetometer (uT):      X= -17.00, Y= -10.31, Z= -43.06
+Euler (H,R,P):           2.63,    2.50,    4.44 deg
+Quaternion (W,X,Y,Z):    1.00,    0.02,    0.04,    0.02
+Accelerometer (m/s^2):  X=  -0.82, Y=   0.37, Z=   9.77
+Linear Accel (m/s^2):   X=  -0.06, Y=  -0.06, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.76, Y=   0.43, Z=   9.77
+Gyroscope (dps):        X=   5.31, Y=   1.00, Z=  10.00
+Magnetometer (uT):      X=  25.19, Y=  -2.75, Z= -40.06
 --------------------------------------------------
-Euler (H,R,P):         143.56,   -4.69,    0.88 deg
-Quaternion (W,X,Y,Z):    0.31,   -0.02,   -0.04,    0.95
-Accelerometer (m/s^2):  X=  -0.19, Y=  -0.90, Z=   9.77
-Linear Accel (m/s^2):   X=  -0.04, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.15, Y=  -0.80, Z=   9.77
-Gyroscope (dps):        X=  -4.56, Y=   2.19, Z=  10.00
-Magnetometer (uT):      X= -17.06, Y=  -9.56, Z= -43.19
+Euler (H,R,P):           3.63,    3.06,    4.56 deg
+Quaternion (W,X,Y,Z):    1.00,    0.03,    0.04,    0.03
+Accelerometer (m/s^2):  X=  -0.81, Y=   0.47, Z=   9.76
+Linear Accel (m/s^2):   X=  -0.03, Y=  -0.05, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.78, Y=   0.52, Z=   9.76
+Gyroscope (dps):        X=   5.19, Y=   0.94, Z=  10.00
+Magnetometer (uT):      X=  25.25, Y=  -3.56, Z= -40.00
 --------------------------------------------------
-Euler (H,R,P):         144.63,   -5.13,    1.13 deg
-Quaternion (W,X,Y,Z):    0.30,   -0.02,   -0.04,    0.95
-Accelerometer (m/s^2):  X=  -0.20, Y=  -0.98, Z=   9.77
-Linear Accel (m/s^2):   X=  -0.01, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.19, Y=  -0.88, Z=   9.77
-Gyroscope (dps):        X=  -4.31, Y=   2.19, Z=  10.00
-Magnetometer (uT):      X= -17.13, Y=  -8.88, Z= -43.31
+Euler (H,R,P):           4.69,    3.56,    4.63 deg
+Quaternion (W,X,Y,Z):    1.00,    0.03,    0.04,    0.04
+Accelerometer (m/s^2):  X=  -0.80, Y=   0.57, Z=   9.76
+Linear Accel (m/s^2):   X=  -0.01, Y=  -0.04, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.80, Y=   0.61, Z=   9.76
+Gyroscope (dps):        X=   5.00, Y=   0.81, Z=  10.00
+Magnetometer (uT):      X=  25.25, Y=  -4.31, Z= -39.88
 --------------------------------------------------
-Euler (H,R,P):         145.69,   -5.56,    1.31 deg
-Quaternion (W,X,Y,Z):    0.29,   -0.03,   -0.04,    0.95
-Accelerometer (m/s^2):  X=  -0.21, Y=  -1.05, Z=   9.76
-Linear Accel (m/s^2):   X=   0.02, Y=  -0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.23, Y=  -0.95, Z=   9.76
-Gyroscope (dps):        X=  -4.00, Y=   2.19, Z=  10.00
-Magnetometer (uT):      X= -17.19, Y=  -8.25, Z= -43.44
+Euler (H,R,P):           5.69,    4.06,    4.75 deg
+Quaternion (W,X,Y,Z):    1.00,    0.03,    0.04,    0.05
+Accelerometer (m/s^2):  X=  -0.79, Y=   0.67, Z=   9.75
+Linear Accel (m/s^2):   X=   0.02, Y=  -0.03, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.81, Y=   0.70, Z=   9.75
+Gyroscope (dps):        X=   4.81, Y=   0.75, Z=  10.00
+Magnetometer (uT):      X=  25.25, Y=  -5.06, Z= -39.81
 --------------------------------------------------
-Euler (H,R,P):         146.75,   -6.00,    1.56 deg
-Quaternion (W,X,Y,Z):    0.28,   -0.03,   -0.05,    0.96
-Accelerometer (m/s^2):  X=  -0.22, Y=  -1.11, Z=   9.75
-Linear Accel (m/s^2):   X=   0.05, Y=  -0.09, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.27, Y=  -1.02, Z=   9.75
-Gyroscope (dps):        X=  -3.69, Y=   2.13, Z=  10.00
-Magnetometer (uT):      X= -17.25, Y=  -7.56, Z= -43.50
+Euler (H,R,P):           6.75,    4.56,    4.81 deg
+Quaternion (W,X,Y,Z):    1.00,    0.04,    0.04,    0.06
+Accelerometer (m/s^2):  X=  -0.78, Y=   0.76, Z=   9.74
+Linear Accel (m/s^2):   X=   0.05, Y=  -0.02, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.82, Y=   0.78, Z=   9.74
+Gyroscope (dps):        X=   4.63, Y=   0.63, Z=  10.00
+Magnetometer (uT):      X=  25.31, Y=  -5.75, Z= -39.69
 --------------------------------------------------
-Euler (H,R,P):         147.81,   -6.38,    1.81 deg
-Quaternion (W,X,Y,Z):    0.28,   -0.03,   -0.05,    0.96
-Accelerometer (m/s^2):  X=  -0.24, Y=  -1.17, Z=   9.74
-Linear Accel (m/s^2):   X=   0.07, Y=  -0.09, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.31, Y=  -1.09, Z=   9.74
-Gyroscope (dps):        X=  -3.38, Y=   2.13, Z=  10.00
-Magnetometer (uT):      X= -17.31, Y=  -6.94, Z= -43.63
+Euler (H,R,P):           7.75,    5.00,    4.88 deg
+Quaternion (W,X,Y,Z):    1.00,    0.04,    0.05,    0.07
+Accelerometer (m/s^2):  X=  -0.76, Y=   0.85, Z=   9.73
+Linear Accel (m/s^2):   X=   0.07, Y=  -0.01, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.83, Y=   0.86, Z=   9.73
+Gyroscope (dps):        X=   4.38, Y=   0.50, Z=  10.00
+Magnetometer (uT):      X=  25.25, Y=  -6.44, Z= -39.56
 --------------------------------------------------
-Euler (H,R,P):         148.81,   -6.69,    2.00 deg
-Quaternion (W,X,Y,Z):    0.27,   -0.03,   -0.05,    0.96
-Accelerometer (m/s^2):  X=  -0.25, Y=  -1.22, Z=   9.73
-Linear Accel (m/s^2):   X=   0.10, Y=  -0.08, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.35, Y=  -1.15, Z=   9.73
-Gyroscope (dps):        X=  -3.06, Y=   2.06, Z=  10.00
-Magnetometer (uT):      X= -17.31, Y=  -6.31, Z= -43.69
+Euler (H,R,P):           8.81,    5.44,    4.94 deg
+Quaternion (W,X,Y,Z):    1.00,    0.04,    0.05,    0.07
+Accelerometer (m/s^2):  X=  -0.74, Y=   0.93, Z=   9.73
+Linear Accel (m/s^2):   X=   0.10, Y=   0.01, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.84, Y=   0.93, Z=   9.73
+Gyroscope (dps):        X=   4.13, Y=   0.44, Z=  10.00
+Magnetometer (uT):      X=  25.25, Y=  -7.13, Z= -39.50
 --------------------------------------------------
-Euler (H,R,P):         149.88,   -7.00,    2.25 deg
-Quaternion (W,X,Y,Z):    0.26,   -0.03,   -0.05,    0.96
-Accelerometer (m/s^2):  X=  -0.26, Y=  -1.27, Z=   9.73
-Linear Accel (m/s^2):   X=   0.12, Y=  -0.07, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.38, Y=  -1.20, Z=   9.73
-Gyroscope (dps):        X=  -2.69, Y=   2.00, Z=  10.00
-Magnetometer (uT):      X= -17.38, Y=  -5.75, Z= -43.75
+Euler (H,R,P):           9.81,    5.88,    4.94 deg
+Quaternion (W,X,Y,Z):    0.99,    0.05,    0.05,    0.08
+Accelerometer (m/s^2):  X=  -0.73, Y=   1.01, Z=   9.72
+Linear Accel (m/s^2):   X=   0.12, Y=   0.02, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.00, Z=   9.72
+Gyroscope (dps):        X=   3.81, Y=   0.31, Z=  10.00
+Magnetometer (uT):      X=  25.19, Y=  -7.81, Z= -39.38
 --------------------------------------------------
-Euler (H,R,P):         150.94,   -7.25,    2.44 deg
-Quaternion (W,X,Y,Z):    0.25,   -0.04,   -0.06,    0.97
-Accelerometer (m/s^2):  X=  -0.28, Y=  -1.30, Z=   9.72
-Linear Accel (m/s^2):   X=   0.14, Y=  -0.06, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.42, Y=  -1.24, Z=   9.72
-Gyroscope (dps):        X=  -2.31, Y=   1.94, Z=  10.00
-Magnetometer (uT):      X= -17.44, Y=  -5.19, Z= -43.81
+Euler (H,R,P):          10.88,    6.25,    5.00 deg
+Quaternion (W,X,Y,Z):    0.99,    0.05,    0.05,    0.09
+Accelerometer (m/s^2):  X=  -0.71, Y=   1.09, Z=   9.71
+Linear Accel (m/s^2):   X=   0.14, Y=   0.03, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.06, Z=   9.71
+Gyroscope (dps):        X=   3.50, Y=   0.19, Z=  10.00
+Magnetometer (uT):      X=  25.19, Y=  -8.50, Z= -39.25
 --------------------------------------------------
-Euler (H,R,P):         152.00,   -7.50,    2.63 deg
-Quaternion (W,X,Y,Z):    0.24,   -0.04,   -0.06,    0.97
-Accelerometer (m/s^2):  X=  -0.29, Y=  -1.33, Z=   9.71
-Linear Accel (m/s^2):   X=   0.16, Y=  -0.05, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.45, Y=  -1.28, Z=   9.71
-Gyroscope (dps):        X=  -1.94, Y=   1.94, Z=  10.00
-Magnetometer (uT):      X= -17.44, Y=  -4.63, Z= -43.81
+Euler (H,R,P):          11.88,    6.56,    5.00 deg
+Quaternion (W,X,Y,Z):    0.99,    0.05,    0.05,    0.10
+Accelerometer (m/s^2):  X=  -0.70, Y=   1.16, Z=   9.70
+Linear Accel (m/s^2):   X=   0.16, Y=   0.04, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.12, Z=   9.70
+Gyroscope (dps):        X=   3.19, Y=   0.13, Z=  10.00
+Magnetometer (uT):      X=  25.13, Y=  -9.13, Z= -39.19
 --------------------------------------------------
-Euler (H,R,P):         153.06,   -7.69,    2.88 deg
-Quaternion (W,X,Y,Z):    0.23,   -0.04,   -0.06,    0.97
-Accelerometer (m/s^2):  X=  -0.31, Y=  -1.35, Z=   9.71
-Linear Accel (m/s^2):   X=   0.17, Y=  -0.04, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.49, Y=  -1.31, Z=   9.71
-Gyroscope (dps):        X=  -1.56, Y=   1.88, Z=  10.00
-Magnetometer (uT):      X= -17.50, Y=  -4.13, Z= -43.88
---------------------------------------------------
-Euler (H,R,P):         154.13,   -7.81,    3.06 deg
-Quaternion (W,X,Y,Z):    0.22,   -0.04,   -0.06,    0.97
-Accelerometer (m/s^2):  X=  -0.33, Y=  -1.37, Z=   9.70
-Linear Accel (m/s^2):   X=   0.19, Y=  -0.03, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.52, Y=  -1.33, Z=   9.70
-Gyroscope (dps):        X=  -1.13, Y=   1.81, Z=  10.00
-Magnetometer (uT):      X= -17.56, Y=  -3.63, Z= -43.88
---------------------------------------------------
-Euler (H,R,P):         155.19,   -7.94,    3.25 deg
-Quaternion (W,X,Y,Z):    0.21,   -0.04,   -0.06,    0.97
-Accelerometer (m/s^2):  X=  -0.36, Y=  -1.37, Z=   9.70
-Linear Accel (m/s^2):   X=   0.19, Y=  -0.02, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.55, Y=  -1.35, Z=   9.70
-Gyroscope (dps):        X=  -0.75, Y=   1.75, Z=  10.00
-Magnetometer (uT):      X= -17.56, Y=  -3.19, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         156.25,   -8.00,    3.38 deg
-Quaternion (W,X,Y,Z):    0.20,   -0.04,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.38, Y=  -1.37, Z=   9.69
-Linear Accel (m/s^2):   X=   0.20, Y=  -0.01, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.58, Y=  -1.36, Z=   9.69
-Gyroscope (dps):        X=  -0.31, Y=   1.63, Z=  10.00
-Magnetometer (uT):      X= -17.63, Y=  -2.75, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         157.31,   -8.00,    3.56 deg
-Quaternion (W,X,Y,Z):    0.19,   -0.04,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.41, Y=  -1.36, Z=   9.69
-Linear Accel (m/s^2):   X=   0.20, Y=   0.00, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.61, Y=  -1.36, Z=   9.69
-Gyroscope (dps):        X=   0.13, Y=   1.56, Z=  10.00
-Magnetometer (uT):      X= -17.63, Y=  -2.38, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         158.38,   -7.94,    3.75 deg
-Quaternion (W,X,Y,Z):    0.18,   -0.04,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.44, Y=  -1.34, Z=   9.69
-Linear Accel (m/s^2):   X=   0.20, Y=   0.01, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.64, Y=  -1.36, Z=   9.69
-Gyroscope (dps):        X=   0.50, Y=   1.50, Z=  10.00
-Magnetometer (uT):      X= -17.69, Y=  -2.06, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         159.44,   -7.88,    3.88 deg
-Quaternion (W,X,Y,Z):    0.18,   -0.05,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.47, Y=  -1.32, Z=   9.69
-Linear Accel (m/s^2):   X=   0.19, Y=   0.03, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.67, Y=  -1.34, Z=   9.69
-Gyroscope (dps):        X=   0.94, Y=   1.44, Z=  10.00
-Magnetometer (uT):      X= -17.69, Y=  -1.69, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         160.50,   -7.75,    4.06 deg
-Quaternion (W,X,Y,Z):    0.17,   -0.05,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.51, Y=  -1.29, Z=   9.69
-Linear Accel (m/s^2):   X=   0.18, Y=   0.04, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.69, Y=  -1.32, Z=   9.69
-Gyroscope (dps):        X=   1.31, Y=   1.31, Z=  10.00
-Magnetometer (uT):      X= -17.75, Y=  -1.44, Z= -43.94
---------------------------------------------------
-Euler (H,R,P):         161.56,   -7.63,    4.19 deg
-Quaternion (W,X,Y,Z):    0.16,   -0.05,   -0.06,    0.98
-Accelerometer (m/s^2):  X=  -0.55, Y=  -1.25, Z=   9.69
+Euler (H,R,P):          12.94,    6.88,    5.00 deg
+Quaternion (W,X,Y,Z):    0.99,    0.05,    0.05,    0.11
+Accelerometer (m/s^2):  X=  -0.68, Y=   1.22, Z=   9.70
 Linear Accel (m/s^2):   X=   0.17, Y=   0.05, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.71, Y=  -1.30, Z=   9.69
-Gyroscope (dps):        X=   1.75, Y=   1.25, Z=  10.00
-Magnetometer (uT):      X= -17.75, Y=  -1.13, Z= -43.94
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.17, Z=   9.70
+Gyroscope (dps):        X=   2.81, Y=   0.00, Z=  10.00
+Magnetometer (uT):      X=  25.00, Y=  -9.69, Z= -39.06
 --------------------------------------------------
-Euler (H,R,P):         162.63,   -7.44,    4.31 deg
-Quaternion (W,X,Y,Z):    0.15,   -0.05,   -0.06,    0.99
-Accelerometer (m/s^2):  X=  -0.58, Y=  -1.20, Z=   9.70
-Linear Accel (m/s^2):   X=   0.15, Y=   0.06, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.73, Y=  -1.26, Z=   9.70
-Gyroscope (dps):        X=   2.13, Y=   1.13, Z=  10.00
-Magnetometer (uT):      X= -17.81, Y=  -0.94, Z= -43.94
+Euler (H,R,P):          13.94,    7.19,    5.00 deg
+Quaternion (W,X,Y,Z):    0.99,    0.06,    0.05,    0.12
+Accelerometer (m/s^2):  X=  -0.67, Y=   1.28, Z=   9.69
+Linear Accel (m/s^2):   X=   0.18, Y=   0.06, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.22, Z=   9.69
+Gyroscope (dps):        X=   2.50, Y=  -0.06, Z=  10.00
+Magnetometer (uT):      X=  24.94, Y= -10.25, Z= -39.00
 --------------------------------------------------
-Euler (H,R,P):         163.63,   -7.19,    4.44 deg
-Quaternion (W,X,Y,Z):    0.14,   -0.05,   -0.06,    0.99
-Accelerometer (m/s^2):  X=  -0.62, Y=  -1.15, Z=   9.70
-Linear Accel (m/s^2):   X=   0.13, Y=   0.07, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.75, Y=  -1.22, Z=   9.70
-Gyroscope (dps):        X=   2.50, Y=   1.06, Z=  10.00
-Magnetometer (uT):      X= -17.81, Y=  -0.69, Z= -43.94
+Euler (H,R,P):          15.00,    7.44,    5.00 deg
+Quaternion (W,X,Y,Z):    0.99,    0.06,    0.05,    0.13
+Accelerometer (m/s^2):  X=  -0.66, Y=   1.33, Z=   9.69
+Linear Accel (m/s^2):   X=   0.19, Y=   0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.26, Z=   9.69
+Gyroscope (dps):        X=   2.13, Y=  -0.19, Z=  10.00
+Magnetometer (uT):      X=  24.81, Y= -10.81, Z= -38.94
 --------------------------------------------------
-Euler (H,R,P):         164.75,   -6.88,    4.50 deg
-Quaternion (W,X,Y,Z):    0.13,   -0.05,   -0.05,    0.99
-Accelerometer (m/s^2):  X=  -0.66, Y=  -1.10, Z=   9.71
-Linear Accel (m/s^2):   X=   0.11, Y=   0.07, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.77, Y=  -1.17, Z=   9.71
-Gyroscope (dps):        X=   2.88, Y=   0.94, Z=  10.00
-Magnetometer (uT):      X= -17.88, Y=  -0.56, Z= -43.94
+Euler (H,R,P):          16.00,    7.63,    4.94 deg
+Quaternion (W,X,Y,Z):    0.99,    0.06,    0.05,    0.14
+Accelerometer (m/s^2):  X=  -0.65, Y=   1.37, Z=   9.68
+Linear Accel (m/s^2):   X=   0.20, Y=   0.08, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.85, Y=   1.29, Z=   9.68
+Gyroscope (dps):        X=   1.75, Y=  -0.31, Z=  10.00
+Magnetometer (uT):      X=  24.69, Y= -11.31, Z= -38.88
 --------------------------------------------------
-Euler (H,R,P):         165.75,   -6.56,    4.63 deg
-Quaternion (W,X,Y,Z):    0.12,   -0.05,   -0.05,    0.99
-Accelerometer (m/s^2):  X=  -0.70, Y=  -1.04, Z=   9.71
-Linear Accel (m/s^2):   X=   0.08, Y=   0.08, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.79, Y=  -1.12, Z=   9.71
-Gyroscope (dps):        X=   3.19, Y=   0.88, Z=  10.00
-Magnetometer (uT):      X= -17.88, Y=  -0.38, Z= -43.94
+Euler (H,R,P):          17.06,    7.75,    4.94 deg
+Quaternion (W,X,Y,Z):    0.99,    0.06,    0.05,    0.15
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.40, Z=   9.68
+Linear Accel (m/s^2):   X=   0.20, Y=   0.08, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.84, Y=   1.32, Z=   9.68
+Gyroscope (dps):        X=   1.31, Y=  -0.38, Z=  10.00
+Magnetometer (uT):      X=  24.56, Y= -11.81, Z= -38.81
 --------------------------------------------------
-Euler (H,R,P):         166.81,   -6.19,    4.69 deg
-Quaternion (W,X,Y,Z):    0.11,   -0.05,   -0.05,    0.99
-Accelerometer (m/s^2):  X=  -0.74, Y=  -0.97, Z=   9.72
-Linear Accel (m/s^2):   X=   0.06, Y=   0.09, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.80, Y=  -1.06, Z=   9.72
-Gyroscope (dps):        X=   3.56, Y=   0.75, Z=  10.00
-Magnetometer (uT):      X= -17.88, Y=  -0.25, Z= -43.88
+Euler (H,R,P):          18.06,    7.88,    4.88 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.15
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.43, Z=   9.68
+Linear Accel (m/s^2):   X=   0.20, Y=   0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.83, Y=   1.34, Z=   9.68
+Gyroscope (dps):        X=   0.94, Y=  -0.50, Z=  10.00
+Magnetometer (uT):      X=  24.38, Y= -12.25, Z= -38.75
 --------------------------------------------------
-Euler (H,R,P):         167.88,   -5.81,    4.75 deg
-Quaternion (W,X,Y,Z):    0.10,   -0.05,   -0.05,    0.99
-Accelerometer (m/s^2):  X=  -0.78, Y=  -0.90, Z=   9.72
-Linear Accel (m/s^2):   X=   0.03, Y=   0.09, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.82, Y=  -0.99, Z=   9.72
-Gyroscope (dps):        X=   3.88, Y=   0.69, Z=  10.00
-Magnetometer (uT):      X= -17.94, Y=  -0.19, Z= -43.88
+Euler (H,R,P):          19.13,    7.94,    4.81 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.16
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.45, Z=   9.68
+Linear Accel (m/s^2):   X=   0.19, Y=   0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.82, Y=   1.35, Z=   9.68
+Gyroscope (dps):        X=   0.56, Y=  -0.63, Z=  10.00
+Magnetometer (uT):      X=  24.25, Y= -12.69, Z= -38.75
 --------------------------------------------------
-Euler (H,R,P):         168.94,   -5.38,    4.81 deg
-Quaternion (W,X,Y,Z):    0.09,   -0.05,   -0.04,    0.99
-Accelerometer (m/s^2):  X=  -0.82, Y=  -0.82, Z=   9.73
-Linear Accel (m/s^2):   X=   0.00, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.83, Y=  -0.92, Z=   9.73
-Gyroscope (dps):        X=   4.13, Y=   0.56, Z=  10.00
-Magnetometer (uT):      X= -18.00, Y=  -0.06, Z= -43.88
+Euler (H,R,P):          20.19,    8.00,    4.75 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.17
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.46, Z=   9.68
+Linear Accel (m/s^2):   X=   0.18, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.81, Y=   1.36, Z=   9.68
+Gyroscope (dps):        X=   0.13, Y=  -0.69, Z=  10.00
+Magnetometer (uT):      X=  24.06, Y= -13.13, Z= -38.69
 --------------------------------------------------
-Euler (H,R,P):         170.00,   -4.94,    4.88 deg
-Quaternion (W,X,Y,Z):    0.08,   -0.05,   -0.04,    0.99
-Accelerometer (m/s^2):  X=  -0.86, Y=  -0.74, Z=   9.73
-Linear Accel (m/s^2):   X=  -0.02, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.84, Y=  -0.84, Z=   9.73
-Gyroscope (dps):        X=   4.44, Y=   0.44, Z=  10.00
-Magnetometer (uT):      X= -18.00, Y=  -0.06, Z= -43.88
+Euler (H,R,P):          21.19,    8.00,    4.69 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.18
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.46, Z=   9.68
+Linear Accel (m/s^2):   X=   0.17, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.80, Y=   1.36, Z=   9.68
+Gyroscope (dps):        X=  -0.25, Y=  -0.81, Z=  10.00
+Magnetometer (uT):      X=  23.88, Y= -13.50, Z= -38.69
 --------------------------------------------------
-Euler (H,R,P):         171.06,   -4.44,    4.94 deg
-Quaternion (W,X,Y,Z):    0.08,   -0.05,   -0.04,    1.00
-Accelerometer (m/s^2):  X=  -0.89, Y=  -0.66, Z=   9.74
-Linear Accel (m/s^2):   X=  -0.05, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.84, Y=  -0.76, Z=   9.74
-Gyroscope (dps):        X=   4.63, Y=   0.38, Z=  10.00
-Magnetometer (uT):      X= -18.06, Y=   0.00, Z= -43.88
+Euler (H,R,P):          22.25,    7.94,    4.56 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.19
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.45, Z=   9.68
+Linear Accel (m/s^2):   X=   0.16, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.78, Y=   1.35, Z=   9.68
+Gyroscope (dps):        X=  -0.69, Y=  -0.94, Z=  10.00
+Magnetometer (uT):      X=  23.63, Y= -13.81, Z= -38.69
 --------------------------------------------------
-Euler (H,R,P):         172.19,   -3.94,    5.00 deg
-Quaternion (W,X,Y,Z):    0.07,   -0.05,   -0.03,    1.00
-Accelerometer (m/s^2):  X=  -0.93, Y=  -0.57, Z=   9.75
-Linear Accel (m/s^2):   X=  -0.08, Y=   0.10, Z=   0.00
-Gravity Vector (m/s^2): X=  -0.85, Y=  -0.67, Z=   9.75
-Gyroscope (dps):        X=   4.88, Y=   0.25, Z=  10.00
-Magnetometer (uT):      X= -18.06, Y=   0.00, Z= -43.81
+Euler (H,R,P):          23.25,    7.88,    4.50 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.20
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.44, Z=   9.69
+Linear Accel (m/s^2):   X=   0.14, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.77, Y=   1.34, Z=   9.69
+Gyroscope (dps):        X=  -1.06, Y=  -1.00, Z=  10.00
+Magnetometer (uT):      X=  23.44, Y= -14.13, Z= -38.75
 --------------------------------------------------
-Euler (H,R,P):         173.25,   -3.44,    5.00 deg
-Quaternion (W,X,Y,Z):    0.06,   -0.05,   -0.03,    1.00
-Accelerometer (m/s^2):  X=  -0.95, Y=  -0.48, Z=   9.75
+Euler (H,R,P):          24.31,    7.75,    4.38 deg
+Quaternion (W,X,Y,Z):    0.98,    0.06,    0.05,    0.21
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.41, Z=   9.69
+Linear Accel (m/s^2):   X=   0.12, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.75, Y=   1.31, Z=   9.69
+Gyroscope (dps):        X=  -1.50, Y=  -1.06, Z=  10.00
+Magnetometer (uT):      X=  23.19, Y= -14.38, Z= -38.75
+--------------------------------------------------
+Euler (H,R,P):          25.31,    7.56,    4.25 deg
+Quaternion (W,X,Y,Z):    0.97,    0.06,    0.05,    0.22
+Accelerometer (m/s^2):  X=  -0.63, Y=   1.38, Z=   9.69
+Linear Accel (m/s^2):   X=   0.09, Y=   0.10, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.73, Y=   1.28, Z=   9.70
+Gyroscope (dps):        X=  -1.88, Y=  -1.19, Z=  10.00
+Magnetometer (uT):      X=  22.94, Y= -14.63, Z= -38.81
+--------------------------------------------------
+Euler (H,R,P):          26.38,    7.31,    4.13 deg
+Quaternion (W,X,Y,Z):    0.97,    0.05,    0.05,    0.23
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.34, Z=   9.70
+Linear Accel (m/s^2):   X=   0.07, Y=   0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.71, Y=   1.25, Z=   9.70
+Gyroscope (dps):        X=  -2.25, Y=  -1.25, Z=  10.00
+Magnetometer (uT):      X=  22.69, Y= -14.88, Z= -38.88
+--------------------------------------------------
+Euler (H,R,P):          27.44,    7.06,    4.00 deg
+Quaternion (W,X,Y,Z):    0.97,    0.05,    0.05,    0.23
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.29, Z=   9.71
+Linear Accel (m/s^2):   X=   0.04, Y=   0.09, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.68, Y=   1.21, Z=   9.71
+Gyroscope (dps):        X=  -2.63, Y=  -1.38, Z=  10.00
+Magnetometer (uT):      X=  22.38, Y= -15.06, Z= -39.00
+--------------------------------------------------
+Euler (H,R,P):          28.44,    6.81,    3.88 deg
+Quaternion (W,X,Y,Z):    0.97,    0.05,    0.05,    0.24
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.24, Z=   9.72
+Linear Accel (m/s^2):   X=   0.02, Y=   0.08, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.66, Y=   1.16, Z=   9.72
+Gyroscope (dps):        X=  -2.94, Y=  -1.44, Z=  10.00
+Magnetometer (uT):      X=  22.13, Y= -15.19, Z= -39.06
+--------------------------------------------------
+Euler (H,R,P):          29.50,    6.50,    3.69 deg
+Quaternion (W,X,Y,Z):    0.97,    0.05,    0.05,    0.25
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.18, Z=   9.72
+Linear Accel (m/s^2):   X=  -0.01, Y=   0.07, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.63, Y=   1.10, Z=   9.72
+Gyroscope (dps):        X=  -3.31, Y=  -1.50, Z=  10.00
+Magnetometer (uT):      X=  21.81, Y= -15.38, Z= -39.19
+--------------------------------------------------
+Euler (H,R,P):          30.50,    6.13,    3.50 deg
+Quaternion (W,X,Y,Z):    0.96,    0.04,    0.04,    0.26
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.11, Z=   9.73
+Linear Accel (m/s^2):   X=  -0.04, Y=   0.06, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.60, Y=   1.04, Z=   9.73
+Gyroscope (dps):        X=  -3.63, Y=  -1.63, Z=  10.00
+Magnetometer (uT):      X=  21.50, Y= -15.44, Z= -39.31
+--------------------------------------------------
+Euler (H,R,P):          31.56,    5.75,    3.38 deg
+Quaternion (W,X,Y,Z):    0.96,    0.04,    0.04,    0.27
+Accelerometer (m/s^2):  X=  -0.64, Y=   1.03, Z=   9.74
+Linear Accel (m/s^2):   X=  -0.06, Y=   0.05, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.57, Y=   0.98, Z=   9.74
+Gyroscope (dps):        X=  -3.94, Y=  -1.69, Z=  10.00
+Magnetometer (uT):      X=  21.19, Y= -15.56, Z= -39.50
+--------------------------------------------------
+Euler (H,R,P):          32.63,    5.31,    3.19 deg
+Quaternion (W,X,Y,Z):    0.96,    0.04,    0.04,    0.28
+Accelerometer (m/s^2):  X=  -0.63, Y=   0.95, Z=   9.75
+Linear Accel (m/s^2):   X=  -0.09, Y=   0.04, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.54, Y=   0.90, Z=   9.75
+Gyroscope (dps):        X=  -4.19, Y=  -1.75, Z=  10.00
+Magnetometer (uT):      X=  20.81, Y= -15.56, Z= -39.63
+--------------------------------------------------
+Euler (H,R,P):          33.63,    4.88,    3.00 deg
+Quaternion (W,X,Y,Z):    0.96,    0.03,    0.04,    0.29
+Accelerometer (m/s^2):  X=  -0.62, Y=   0.86, Z=   9.76
+Linear Accel (m/s^2):   X=  -0.11, Y=   0.03, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.51, Y=   0.83, Z=   9.76
+Gyroscope (dps):        X=  -4.44, Y=  -1.81, Z=  10.00
+Magnetometer (uT):      X=  20.50, Y= -15.63, Z= -39.81
+--------------------------------------------------
+Euler (H,R,P):          34.69,    4.38,    2.81 deg
+Quaternion (W,X,Y,Z):    0.95,    0.03,    0.03,    0.30
+Accelerometer (m/s^2):  X=  -0.61, Y=   0.77, Z=   9.77
+Linear Accel (m/s^2):   X=  -0.13, Y=   0.02, Z=   0.00
+Gravity Vector (m/s^2): X=  -0.48, Y=   0.75, Z=   9.77
+Gyroscope (dps):        X=  -4.69, Y=  -1.88, Z=  10.00
+Magnetometer (uT):      X=  20.13, Y= -15.63, Z= -40.00
+--------------------------------------------------
+Euler (H,R,P):       

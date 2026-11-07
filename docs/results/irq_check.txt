@@ -1,0 +1,5 @@
+spi-xchg dev=0 tx=018000 rc=EOK data=000301 guest_ms=2
+spi-xchg dev=0 tx=018000 rc=EOK data=000301 guest_ms=0
+spi-xchg dev=0 tx=018000 rc=EOK data=000300 guest_ms=0
+i2c-read addr=0x28 reg=0x00 rc=EOK data=a0 guest_ms=2
+i2c-read addr=0x28 reg=0x00 rc=EOK data=a0 guest_ms=1
