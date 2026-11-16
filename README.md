@@ -171,6 +171,8 @@ scripts/run_guest.sh ctl fault nak --bus i2c --target 0x28 --count 3     # or fr
 scripts/run_guest.sh stop
 ```
 
+The recorded patch panel with nothing installed: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Marc-Dvci/Patchbay?quickstart=1)
+
 Host tests only (no QNX SDP needed):
 
 ```bash
