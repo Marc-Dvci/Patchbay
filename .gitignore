@@ -1,7 +1,6 @@
 # Keys and local settings
 .env
 .env.*
-!.env.example
 
 # Python
 .venv/

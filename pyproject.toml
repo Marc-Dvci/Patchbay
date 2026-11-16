@@ -3,8 +3,6 @@
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-# app/ and web/ are left from the project template and are not part of Patchbay (see README, Layout).
-extend-exclude = ["app", "web", "tests/test_core.py", "tests/test_server.py"]
 
 [tool.ruff.lint]
 # pycodestyle errors, pyflakes, bugbear, import order
@@ -20,8 +18,7 @@ pythonpath = ["."]
 # -ra lists every skip and expected failure with its reason; --strict-markers refuses a misspelt marker.
 # pytest-randomly shuffles the order on every run (replay a run with --randomly-seed=<seed>);
 # pytest-timeout fails any test that runs past `timeout` seconds.
-# The two --ignore lines keep the project template's web tests out of the run; app/ is not part of Patchbay.
-addopts = "-m 'not guest' -ra --strict-markers --ignore=tests/test_core.py --ignore=tests/test_server.py"
+addopts = "-m 'not guest' -ra --strict-markers"
 timeout = 30
 xfail_strict = true
 # Unmarked tests are unit tests. Mark the others so the split can be counted (see tests.yml).
