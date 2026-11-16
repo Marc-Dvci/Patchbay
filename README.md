@@ -1,10 +1,15 @@
 # Patchbay
 
 [![Tests](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml/badge.svg)](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/Marc-Dvci/Patchbay/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/Patchbay/actions/workflows/codeql.yml)
 [![Tests: 204 passed](https://img.shields.io/badge/tests-17%20C%20%C2%B7%20187%20Python%20passed-brightgreen)](#evidence)
 [![Fault matrix 16 of 16](https://img.shields.io/badge/fault%20matrix-16%20of%2016-brightgreen)](docs/results/fault_matrix.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![QNX SDP 8.0](https://img.shields.io/badge/QNX%20SDP-8.0-0a7d6e)](#build-and-run)
+
+[![The film: Patchbay running on QNX 8.0, under 3 minutes](docs/film-thumbnail.png)](https://youtu.be/y6mgFqYT4RI)
+
+[Watch the film on YouTube](https://youtu.be/y6mgFqYT4RI) (under 3 minutes).
 
 **Virtio I2C and SPI master drivers for QNX 8.0, built on the QNX Driver Development Kit, with a back end that
 simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM, with no board.**
