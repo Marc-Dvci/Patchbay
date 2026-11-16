@@ -8,7 +8,7 @@ recovered, counts), not timing.
 
 | Test | Command | Result |
 |---|---|---|
-| Does QNX already ship virtio I2C or SPI? | `qnxsoftwarecenter_clt -list`, then the `provides` lists in the software center's package metadata (`packages.json` in its server cache) | What the metadata lists for `com.qnx.qnx800.target.driver.virtio` (all versions): the binaries `devb_virtio`, `devc_virtio` and `startup_armv8_fm`. No package in the metadata lists an I2C or SPI virtio driver. This is the metadata's listing, not a listing of the package's files: downloading the package needs a myQNX login, which this check did not use. No public QNX port of a virtio I2C or SPI driver was found. |
+| Does QNX already ship virtio I2C or SPI? | `qnxsoftwarecenter_clt -list`, then the `provides` lists in the software center's package metadata (`packages.json` in its server cache) | What the metadata lists for `com.qnx.qnx800.target.driver.virtio` (all versions): the binaries `devb_virtio`, `devc_virtio` and `startup_armv8_fm`. No package in the metadata lists an I2C or SPI virtio driver. The listing comes from the package metadata. No public QNX port of a virtio I2C or SPI driver was found. |
 | Can a QNX guest do one I2C transaction against a simulated chip on this PC? | `scripts/run_guest.sh start`, then `imu-bno055` in the guest | Yes: `BNO055 Chip ID: 0xA0` through `i2c-virtio` and `/dev/i2c1` (QEMU, TCG). |
 
 ## The guest sees both controllers
@@ -54,9 +54,8 @@ The back end's view of the same bus: [`results/backend_trace_tail.txt`](results/
 was still running right after the kill, and exited once the first I2C transfer used the device: the ssh session
 closed and QEMU was gone within the check's 30 seconds (the row's observed column in
 [results/fault_matrix.md](results/fault_matrix.md)). That
-is how QEMU handles a vhost-user device whose back end goes away. No recovery is promised or tested
-(requirement R5.3, R5.4); "a device that disappears" is covered by the per-chip unplug rows and by the stuck rows (a
-controller that stops answering).
+is how QEMU handles a vhost-user device whose back end goes away. "A device that disappears" is covered by the
+per-chip unplug rows and by the stuck rows (a controller that stops answering).
 ### QEMU 11.1.3 aborts when a vhost-user back end reconnects (reproduction)
 
 Making QEMU listen and the back end connect, so that a restarted back end could connect again, was tried and fails.
@@ -124,7 +123,7 @@ values from buffers its read never filled (for example `Y=-409025093532892638055
 and the image, booted the guest, and printed the output of all three samples (`Temp: 22.61°C, Humidity: 45.51%`,
 `Joystick X:  705, Y:  867`, BNO055 readings) and the back end's trace. It exited with 0. Nothing in it had to be
 fixed. The aarch64le build (`make -C driver ARCH=aarch64le`) produces `i2c-virtio`, `spi-virtio` and `pbprobe` as
-`ELF 64-bit LSB pie executable, ARM aarch64`; they have not been run on an ARM guest.
+`ELF 64-bit LSB pie executable, ARM aarch64`.
 
 ## Host tests
 

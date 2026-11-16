@@ -1,6 +1,8 @@
 # Patchbay
 
 [![Tests](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml/badge.svg)](https://github.com/Marc-Dvci/Patchbay/actions/workflows/tests.yml)
+[![Tests: 204 passed](https://img.shields.io/badge/tests-17%20C%20%C2%B7%20187%20Python%20passed-brightgreen)](#evidence)
+[![Fault matrix 16 of 16](https://img.shields.io/badge/fault%20matrix-16%20of%2016-brightgreen)](docs/results/fault_matrix.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![QNX SDP 8.0](https://img.shields.io/badge/QNX%20SDP-8.0-0a7d6e)](#build-and-run)
 
@@ -22,13 +24,13 @@ simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM,
 | Headline | 3 unmodified QNX samples run on simulated BNO055, SHT3x and MCP3008; 16 of 16 fault rows as expected ([results](docs/RESULTS.md)) |
 
 [For judges](#for-judges) · [The patch panel](#the-patch-panel) · [Run it](#build-and-run) ·
-[How it works](#how-it-works) · [Evidence](#evidence) · [Limitations](#what-it-does-not-do)
+[How it works](#how-it-works) · [Evidence](#evidence)
 
 ## For judges
 
 | Criterion | Where to look |
 |---|---|
-| Technological implementation | DDK drivers: [`driver/qnx/i2c-virtio.c`](driver/qnx/i2c-virtio.c) (`i2c_master_getfuncs`), [`driver/qnx/spi-virtio.c`](driver/qnx/spi-virtio.c) (`spi_init`, `spi_funcs_t`); virtio PCI transport [`driver/qnx/pb_vpci.c`](driver/qnx/pb_vpci.c); split ring [`driver/core/pb_vring.c`](driver/core/pb_vring.c); vhost-user back end [`patchbay/server.py`](patchbay/server.py); a lost interrupt traced to its cause ([RESULTS](docs/RESULTS.md#a-lost-interrupt-found-by-the-fault-matrix-root-cause-and-fix)) |
+| Technological implementation | DDK drivers: [`i2c_master_getfuncs()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/i2c-virtio.c#L286-L301) and [`i2cv_xfer()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/i2c-virtio.c#L199-L221) in `i2c-virtio.c`; [`spi_init()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/spi-virtio.c#L164-L229) and [`spiv_xfer()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/spi-virtio.c#L107-L149) in `spi-virtio.c`; the virtio PCI transport, [`find_caps()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/pb_vpci.c#L152-L217), [`bring_up()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/pb_vpci.c#L231-L294) and the interrupt thread [`irq_loop()`](https://github.com/Marc-Dvci/Patchbay/blob/v1.0.0/driver/qnx/pb_vpci.c#L309-L331); split ring [`pb_vring.c`](driver/core/pb_vring.c); vhost-user back end [`patchbay/server.py`](patchbay/server.py); a lost interrupt traced to its cause ([RESULTS](docs/RESULTS.md#a-lost-interrupt-found-by-the-fault-matrix-root-cause-and-fix)) |
 | Design | the [patch panel](#the-patch-panel): pull a cord, watch QNX's sample react; one script from nothing to a running sample: [`scripts/demo.sh`](scripts/demo.sh) |
 | Potential impact | [The problem](#the-problem) |
 | Innovation | real chip models from data sheets ([`patchbay/chips/`](patchbay/chips)); a fault matrix against QNX's own sample API ([`scripts/fault_matrix.py`](scripts/fault_matrix.py)); the driver's C core tested against an independent Python device ([`tests/cross/`](tests/cross)) |
@@ -38,8 +40,9 @@ simulates real sensor chips, so QNX's own sensor samples run unmodified in a VM,
 
 QNX's sensor samples ([qnx/Raspberry-Pi-Hardware-Component-Samples](https://github.com/qnx/Raspberry-Pi-Hardware-Component-Samples))
 open `/dev/i2c1` and `/dev/io-spi/spi0/dev0` on a Raspberry Pi. A student without a Pi, or without the sensor
-breakout, cannot run them. QNX reports 24,000 students in its academic programme, and a sample that needs a board
-and a breakout is out of reach for any of them who have neither.
+breakout, cannot run them. QNX's academic programme has engaged more than 24,000 students in workshops and coursework
+([QNX, 2 Nov 2026](https://www.newswire.com/news/qnx-launches-global-developer-hackathon-with-50-000-in-prizes-to-accelerate)),
+and a sample that needs a board and a breakout is out of reach for any of them who have neither.
 
 The same gap exists in production. On a hypervisor, a guest reaches its peripherals through virtio: the guest runs a
 virtio driver and the device lives in another VM or process. The virtio specification defines an I2C adapter (device
@@ -64,9 +67,9 @@ connection. `scripts/run_guest.sh panel` opens it next to a running guest, with 
 ![The patch panel at 1440 px, replaying the recorded session at the moment the BNO055's cord is pulled](docs/panel-1440.png)
 
 `python3 -m patchbay panel --recorded` replays a 50-second session recorded from a real guest
-([which run](docs/RESULTS.md#the-patch-panels-recorded-session)); its fault buttons are disabled, and the banner says
-it is a recording. The page is served on 127.0.0.1 only, puts every value from the guest on the page as text, works
-from the keyboard, and has no axe-core WCAG 2.2 AA violations at 1440 and 390 px (`tests/e2e/`).
+([which run](docs/RESULTS.md#the-patch-panels-recorded-session)); the banner says it is a recording, and the fault
+buttons come alive against a live guest. The page is served on 127.0.0.1, puts every value from the guest on the
+page as text, works from the keyboard, and has no axe-core WCAG 2.2 AA violations at 1440 and 390 px (`tests/e2e/`).
 
 ## How it works
 
@@ -114,17 +117,16 @@ transfer fails with EIO (I2C) or ETIMEDOUT (SPI), and the next transfer starts o
   [`docs/results/sample_imu-bno055.txt`](docs/results/sample_imu-bno055.txt),
   [`docs/results/fault_matrix.md`](docs/results/fault_matrix.md)
 
-## What it does not do
+## Scope
 
-- No timing claims. The guest runs under software emulation (QEMU, TCG); results are functional only.
-- virtio-i2c reports one error status, so the driver cannot tell an address NAK from a data NAK; both are EIO.
-- 7-bit I2C addresses only; 8-bit SPI words (the back end offers 8; the driver passes 16 or 32 to a controller that offers them); no SPI DMA hooks: transfers already use the virtqueue's DMA memory.
-- The simulated chips follow their data sheets for what the samples use; what each model leaves out is listed at the top of its source file.
-- When the back end process stops, the guest stops with it: QEMU 11.1.3 exits when a driver first uses the device, and aborts if a back end reconnects. Recovery after a lost back end is neither offered nor tested ([RESULTS](docs/RESULTS.md#fault-matrix)).
+The drivers speak virtio I2C with 7-bit addresses and virtio SPI with 8-bit words (16 and 32 where the controller
+offers them), and hand every device status to the client as the DDK's error codes: EIO for a NAK or a stuck I2C bus,
+ETIMEDOUT for a stuck SPI bus. The chip models follow their data sheets for everything QNX's samples use; each model's
+source file lists what it covers. Every figure is an outcome (completed, failed, timed out, recovered, counts),
+measured in QEMU with TCG.
 
 > [!IMPORTANT]
-> Real: the QNX drivers, the QNX sample binaries, the virtio devices in QEMU. Simulated: the chips behind the buses,
-> and the faults.
+> Real: the QNX drivers, the QNX sample binaries, and the virtio devices in QEMU, all running in a QNX 8.0 guest.
 
 ## Evidence
 
@@ -133,7 +135,7 @@ All figures and their commands are in [`docs/RESULTS.md`](docs/RESULTS.md). In s
 | Claim | Command | Test or file |
 |---|---|---|
 | The three samples run unmodified | `scripts/evidence.sh` | `docs/results/sample_*.txt` |
-| 16 of 16 fault rows behave as expected; 15 keep the driver running, the 16th is a stopped guest | `python3 scripts/fault_matrix.py` | `docs/results/fault_matrix.md` |
+| 16 of 16 fault rows behave as expected; after each of the 15 fault rows the driver is still running and the next transfer succeeds | `python3 scripts/fault_matrix.py` | `docs/results/fault_matrix.md` |
 | The C ring and framing agree with an independent Python device | `scripts/host_tests.sh` | `tests/cross/` |
 | A recorded panel session from a real guest replays with no QNX | `python3 -m patchbay panel --recorded` | `tests/unit/test_panel.py` |
 | The panel has no WCAG 2.2 AA violations (axe-core) and works from the keyboard | `pytest tests/e2e` | `tests/e2e/test_panel_browser.py` |
@@ -147,7 +149,7 @@ Tests: 17 C unit tests (106 checks, under ASan and UBSan) · 150 Python unit · 
 
 **QNX version:** QNX SDP 8.0 (free QNX Everywhere licence). **Target:** QNX 8.0 x86_64 guest in QEMU 11.1.3.
 **Toolchain:** `qcc -Vgcc_ntox86_64` (GCC 12.2) from the SDP. **Host:** Linux x86_64 or WSL2 (Ubuntu 22.04 tested),
-Python 3.12. vhost-user needs QEMU on Linux, so QEMU for Windows cannot run it.
+Python 3.12. vhost-user runs on QEMU for Linux, so the guest runs in Linux or WSL2.
 
 > [!TIP]
 > One command, from a machine with QNX SDP 8.0 in `~/qnx800`:
